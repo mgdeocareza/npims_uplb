@@ -31,7 +31,9 @@ const Login = () => {
       if (res.data.message === "Login successful") {
         localStorage.setItem("userRole", res.data.role);
         localStorage.setItem("username", username); 
+        console.log("Redirecting to /app");
         navigate("/app");
+        console.log("navigate called");
       }
     } catch (err) {
       console.log("Login error:", err);  
@@ -90,7 +92,7 @@ const Login = () => {
                 </div>
                 <div className="col-4">
                   <button type="submit" className="btn btn-dark btn-block w-100">
-                    Sign In!
+                    Sign In
                   </button>
                 </div>
               </div>
