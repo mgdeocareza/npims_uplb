@@ -9,7 +9,7 @@ const port = process.env.PORT || 5000;
 // Middleware
 // Setup CORS properly — allow frontend origin and credentials
 app.use(cors({
-  origin: "http://localhost:3000",
+  origin: process.env.CORS_ORIGIN.split(","),
   credentials: true,
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"], // allow all needed methods
   allowedHeaders: ["Content-Type", "Authorization"],    // allow needed headers
