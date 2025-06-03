@@ -1,53 +1,48 @@
-import { useNavigate } from "react-router-dom";
+import logoLeft from "../images/left-image.png";
+import logoRight from "../images/right-image.png";
 
 export default function Navbar({ toggleSidebar }) {
-  const navigate = useNavigate();
-  const role = localStorage.getItem("userRole");
-  const username = localStorage.getItem("username");  
-
-  const handleLogout = () => {
-    localStorage.clear();
-    navigate("/login");
-  };
-
-
   return (
-  <nav
-    className="navbar navbar-dark"
-    style={{
-      backgroundColor: "#191f22",
-      height: "56px",
-      display: "flex",
-      alignItems: "center",
-      padding: "0 15px",
-      color: "#ffffff",
-    }}
-  >
-    {/* Hamburger icon */}
-    <button
-      className="btn btn-link text-white"
-      onClick={toggleSidebar}
-      style={{ fontSize: "1.5rem", border: "none", background: "none" }}
-      aria-label="Toggle sidebar"
+    <nav
+      style={{
+        backgroundColor: "#7b1113",
+        height: "72px",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
+        padding: "0 15px",
+        margin: 0,
+      }}
     >
-      <i className="fas fa-bars"></i>
-    </button>
+      {/* Left side: Hamburger + Left Logo */}
+      <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
+        <button
+          className="btn btn-link text-white"
+          onClick={toggleSidebar}
+          style={{
+            fontSize: "1.5rem",
+            border: "none",
+            background: "none",
+            padding: 0,
+          }}
+          aria-label="Toggle sidebar"
+        >
+          <i className="fas fa-bars"></i>
+        </button>
 
-    {/* Spacer to push right side content to the right */}
-    <div style={{ flexGrow: 1 }}></div>
+        <img
+          src={logoLeft}
+          alt="Left Logo"
+          style={{ height: "55px", width: "auto", margin: 0, padding: 0 }}
+        />
+      </div>
 
-    {/* Group the text and logout button together */}
-    <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
-      {role === "admin" ? (
-        <span>You are logged in as <strong>Admin</strong></span>
-      ) : (
-        <span>Welcome, <strong>{username}</strong></span>
-      )}
-
-      <button className="btn btn-outline-light" onClick={handleLogout}>
-        Logout <i className="fas fa-sign-out-alt"></i>
-      </button>
-    </div>
-  </nav>
+      {/* Right side: Right-aligned image */}
+      <img
+        src={logoRight}
+        alt="Right Logo"
+        style={{ height: "60px", width: "auto", margin: 0, padding: 0 }}
+      />
+    </nav>
   );
 }

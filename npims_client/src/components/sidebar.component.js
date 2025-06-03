@@ -1,92 +1,140 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import npims_logo from '../images/npims-logo.png'; 
+import {
+  FaTh,
+  FaClipboardList,
+  FaLayerGroup,
+  FaFileContract,
+  FaUserTie,
+  FaLaptopHouse,
+  FaPlus,
+  FaUserPlus,
+  FaSignOutAlt,
+} from "react-icons/fa";
 
-export default function Sidebar({ collapsed }) {
+export default function Sidebar({ collapsed, onLogout }) {
   const role = localStorage.getItem("userRole");
+  const username = localStorage.getItem("username");
 
   const allMenuItems = [
-    { to: "/app/dashboard", label: "Dashboard" },
-    { to: "/app", label: "View All Properties" },    
-    { to: "/app/filter-by-material", label: "View by Material Type" },
-    { to: "/app/filter-by-acquisition", label: "View by Acquisition Type" },
-    { to: "/app/filter-by-staff", label: "View by Staff In Charge" },
-    { to: "/app/filter-by-location", label: "View by Assigned Location" },
-    { to: "/app/create", label: "Add New Property" },
-    { to: "/app/user", label: "Add New Staff" },
+    { to: "/app/dashboard", label: "Dashboard", icon: <FaTh /> },
+    { to: "/app", label: "View All Properties", icon: <FaClipboardList /> },
+    { to: "/app/filter-by-material", label: "View By Material Type", icon: <FaLayerGroup /> },
+    { to: "/app/filter-by-acquisition", label: "View By Acquisition Type", icon: <FaFileContract /> },
+    { to: "/app/filter-by-staff", label: "View By Staff In Charge", icon: <FaUserTie /> },
+    { to: "/app/filter-by-location", label: "View By Location", icon: <FaLaptopHouse /> },
+    { to: "/app/create", label: "Add Property", icon: <FaPlus /> },
+    { to: "/app/user", label: "Add Staff", icon: <FaUserPlus /> },
   ];
 
   const menuItems = role === "admin" ? allMenuItems : allMenuItems.slice(0, 4);
 
-  const lineColor = "#444c52";
+  const linkStyle = {
+    display: "flex",
+    alignItems: "center",
+    padding: "10px 20px",
+    color: "#222",
+    textDecoration: "none",
+    fontSize: "0.95rem",
+    gap: "10px",
+    borderRadius: "4px",
+    transition: "background 0.2s",
+  };
+
+  const linkHoverStyle = {
+    backgroundColor: "#f2dede",
+    color: "#7b1113",
+  };
+
+  const [hoveredIndex, setHoveredIndex] = React.useState(null);
 
   return (
     <div
       style={{
         width: collapsed ? "80px" : "250px",
-        backgroundColor: "#222d35",
-        color: "white",
+        backgroundColor: "#f5f5f5",
+        color: "#222",
         height: "100vh",
         transition: "width 0.3s",
         overflowX: "hidden",
-        paddingTop: "20px",
-        boxSizing: "border-box",    // <-- ADD THIS
+        position: "relative",
+        zIndex: 999,
       }}
     >
-    <div style={{ textAlign: "center", marginBottom: "15px", height: "20px" }}>
-      <img
-        src={npims_logo}
-        alt="NPIMS Logo"
+      {/* Top spacing to align with navbar */}
+      <div
         style={{
-          height: "30px",
-          width: "auto",
-          margin: "0 auto",
-          display: "block",
-          filter: collapsed ? "brightness(0) invert(1)" : "none",
+          height: "72px",
+          padding: collapsed ? 0 : "0 20px",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: collapsed ? "center" : "flex-start",
+          fontSize: "0.9rem",
+          borderBottom: "1px solid #ddd",
         }}
-      />
-    </div>
-
-    {/* Full width line with exact thickness and color */}
-    <div
-      style={{
-        height: "1px",
-        width: "100%",
-        backgroundColor: lineColor,
-        margin: 0,
-      }}
-    />
-
+      >
+        {!collapsed && (
+          <span>
+            {role === "admin"
+              ? "Logged in as Admin"
+              : `Logged in as ${username}`}
+          </span>
+        )}
+      </div>
 
       <nav>
-        <ul
-          style={{
-            listStyleType: "none",
-            paddingLeft: 0,
-            margin: 0,
-            fontSize: collapsed ? "0" : "1rem",
-            transition: "font-size 0.3s",
-          }}
-        >
-          {menuItems.map((item) => (
-            <li
+        <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
+          {menuItems.map((item, index) => (
+            <li 
               key={item.to}
               style={{
-                padding: `10px 20px`,
-                borderBottom: `1px solid ${lineColor}`, // line for all items including last
-                boxSizing: "border-box",    // <-- ADD THIS here too (optional)
+                marginTop: index === 0 ? "12px" : "0px", // Only apply top margin to the first item
               }}
             >
               <Link
                 to={item.to}
-                style={{ color: "white", textDecoration: "none" }}
+                style={{
+                  ...linkStyle,
+                  ...(hoveredIndex === index ? linkHoverStyle : {}),
+                  justifyContent: collapsed ? "center" : "flex-start",
+                }}
+                onMouseEnter={() => setHoveredIndex(index)}
+                onMouseLeave={() => setHoveredIndex(null)}
               >
-                {item.label}
+                {item.icon}
+                {!collapsed && item.label}
               </Link>
             </li>
           ))}
         </ul>
       </nav>
+
+      {/* Logout button */}
+      <div style={{ position: "absolute", bottom: "20px", width: "100%" }}>
+        <button
+          onClick={onLogout}
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: collapsed ? "center" : "flex-start",
+            padding: "10px 20px",
+            width: "100%",
+            background: "transparent",
+            color: "#222",
+            border: "none",
+            cursor: "pointer",
+            fontSize: "0.95rem",
+            gap: "10px",
+            borderRadius: "4px",
+            transition: "background 0.2s",
+          }}
+          onMouseEnter={e => (e.currentTarget.style.backgroundColor = "#f2dede")}
+          onMouseLeave={e => (e.currentTarget.style.backgroundColor = "transparent")}
+        >
+          <FaSignOutAlt />
+          {!collapsed && "Logout"}
+        </button>
+      </div>
     </div>
   );
 }

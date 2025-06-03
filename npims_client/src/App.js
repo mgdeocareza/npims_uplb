@@ -1,8 +1,9 @@
+// App.js
 import React, { useState } from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 import '@fortawesome/fontawesome-free/css/all.min.css';
-import "./setupAxios";  
+import "./setupAxios";
 
 import Navbar from "./components/navbar.component";
 import Sidebar from "./components/sidebar.component";
@@ -26,31 +27,29 @@ function App() {
     setSidebarCollapsed(!sidebarCollapsed);
   };
 
+  const handleLogout = () => {
+    localStorage.clear();
+    window.location.href = "/login";
+  };
+
   const role = localStorage.getItem("userRole");
   const isLoggedIn = !!role;
 
   return (
     <Router>
       <Routes>
-        {/* Public login route */}
         <Route path="/login" element={<Login />} />
 
-        {/* Protected app routes */}
         <Route
           path="/app/*"
           element={
             isLoggedIn ? (
               <div style={{ display: "flex", minHeight: "100vh", overflow: "hidden" }}>
-                <Sidebar collapsed={sidebarCollapsed} />
-                <div
-                  style={{
-                    flexGrow: 1,
-                    transition: "margin-left 0.3s",
-                    overflowX: "hidden",
-                    overflowY: "auto",
-                  }}
-                >
+                <Sidebar collapsed={sidebarCollapsed} onLogout={handleLogout} />
+
+                <div style={{ flexGrow: 1, transition: "margin-left 0.3s" }}>
                   <Navbar toggleSidebar={handleToggleSidebar} />
+
                   <div className="container-fluid mt-4">
                     <Routes>
                       <Route path="/" element={<PropertiesList showAll={true} />} />
@@ -74,7 +73,6 @@ function App() {
           }
         />
 
-        {/* Redirect root to login */}
         <Route path="/" element={<Navigate to="/login" replace />} />
       </Routes>
     </Router>
