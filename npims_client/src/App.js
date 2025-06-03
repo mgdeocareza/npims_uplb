@@ -47,25 +47,60 @@ function App() {
               <div style={{ display: "flex", minHeight: "100vh", overflow: "hidden" }}>
                 <Sidebar collapsed={sidebarCollapsed} onLogout={handleLogout} />
 
-                <div style={{ flexGrow: 1, transition: "margin-left 0.3s" }}>
-                  <Navbar toggleSidebar={handleToggleSidebar} />
+                <div
+                  style={{
+                    flexGrow: 1,
+                    transition: "margin-left 0.3s",
+                    marginLeft: sidebarCollapsed ? "80px" : "250px",
+                    display: "flex",
+                    flexDirection: "column",
+                    height: "100vh",
+                  }}
+                >
+                  {/* Fixed Navbar */}
+                  <div
+                    style={{
+                      position: "fixed",
+                      top: 0,
+                      left: sidebarCollapsed ? "80px" : "250px",
+                      right: 0,
+                      height: "72px",
+                      zIndex: 1000,
+                      backgroundColor: "white",
+                      borderBottom: "1px solid #ddd",
+                    }}
+                  >
+                    <Navbar toggleSidebar={handleToggleSidebar} />
+                  </div>
 
-                  <div className="container-fluid mt-4">
-                    <Routes>
-                      <Route path="/" element={<PropertiesList showAll={true} />} />
-                      <Route path="/dashboard" element={<Dashboard />} />
-                      <Route path="/filter-by-article/:article" element={<PropertiesFilteredByArticle />} />
-                      <Route path="/filter-by-material" element={<PropertiesFilteredByMaterial />} />
-                      <Route path="/filter-by-acquisition" element={<PropertiesFilteredByAcquisition />} />
-                      <Route path="/filter-by-staff" element={<PropertiesFilteredByStaff />} />
-                      <Route path="/filter-by-location" element={<PropertiesFilteredByLocation />} />
-                      <Route path="edit/:id" element={<EditProperty />} />
-                      <Route path="view/:id" element={<ViewProperty />} />
-                      <Route path="create" element={<CreateProperty />} />
-                      <Route path="user" element={<CreateUser />} />
-                    </Routes>
+                  {/* Scrollable main content below Navbar */}
+                  <div
+                    style={{
+                      marginTop: "72px", // height of Navbar to avoid overlap
+                      overflowY: "auto",
+                      flexGrow: 1,
+                      padding: "1rem",
+                    }}
+                  >
+                    <div className="container-fluid mt-4">
+                      <Routes>
+                        <Route path="/" element={<PropertiesList showAll={true} />} />
+                        <Route path="/dashboard" element={<Dashboard />} />
+                        <Route path="/filter-by-article/:article" element={<PropertiesFilteredByArticle />} />
+                        <Route path="/filter-by-material" element={<PropertiesFilteredByMaterial />} />
+                        <Route path="/filter-by-acquisition" element={<PropertiesFilteredByAcquisition />} />
+                        <Route path="/filter-by-staff" element={<PropertiesFilteredByStaff />} />
+                        <Route path="/filter-by-location" element={<PropertiesFilteredByLocation />} />
+                        <Route path="edit/:id" element={<EditProperty />} />
+                        <Route path="view/:id" element={<ViewProperty />} />
+                        <Route path="create" element={<CreateProperty />} />
+                        <Route path="user" element={<CreateUser />} />
+                      </Routes>
+                    </div>
                   </div>
                 </div>
+
+
               </div>
             ) : (
               <Navigate to="/login" replace />
