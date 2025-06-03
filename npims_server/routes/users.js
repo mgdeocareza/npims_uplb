@@ -2,58 +2,75 @@ const router = require("express").Router();
 const mongoose = require("mongoose");
 let NPIMSUser = require("../models/NPIMS_User.model");
 
-router.route("/").get((req, res) => {
-  NPIMSUser.find()
-    .then((users) => res.json(users))
-    .catch((err) => res.status(400).json("Error: " + err));
+// GET all users
+router.route("/").get(async (req, res) => {
+  try {
+    const users = await NPIMSUser.find();
+    res.json(users);
+  } catch (err) {
+    res.status(400).json("Error: " + err.message);
+  }
 });
 
-router.route("/:id").get((req, res) => {
-  let id = new mongoose.Types.ObjectId(req.params.id);
-  NPIMSUser.findById(id)
-    .then((user) => res.json(user))
-    .catch((err) => res.status(400).json("Error: " + err));
+// GET user by ID
+router.route("/:id").get(async (req, res) => {
+  try {
+    const id = new mongoose.Types.ObjectId(req.params.id);
+    const user = await NPIMSUser.findById(id);
+    if (!user) return res.status(404).json("User not found.");
+    res.json(user);
+  } catch (err) {
+    res.status(400).json("Error: " + err.message);
+  }
 });
 
-router.route("/add").post((req, res) => {
-  const username = req.body.username;
-  const department = req.body.department;
-  const propertyCount = 0;
+// ADD new user
+router.route("/add").post(async (req, res) => {
+  try {
+    const { username, department } = req.body;
 
-  const newUser = new NPIMSUser({
-    username,
-    department,
-    propertyCount,
-  });
+    const newUser = new NPIMSUser({
+      username,
+      department: Array.isArray(department) ? department : [department],
+      propertyCount: 0
+    });
 
-  newUser
-    .save()
-    .then(() => res.json("User added!"))
-    .catch((err) => res.status(400).json("Error: " + err));
+    await newUser.save();
+    res.json("User added!");
+  } catch (err) {
+    res.status(400).json("Error: " + err.message);
+  }
 });
 
+// UPDATE user
+router.route("/update/:id").post(async (req, res) => {
+  try {
+    const id = new mongoose.Types.ObjectId(req.params.id);
+    const user = await NPIMSUser.findById(id);
+    if (!user) return res.status(404).json("User not found.");
 
-router.route("/update/:id").post((req, res) => {
-  let id = new mongoose.Types.ObjectId(req.params.id);
-  NPIMSUser.findById(id)
-    .then((user) => {
-      user.username = req.body.username;
-      user.department = req.body.department;
-      user.propertyCount = Number(req.body.propertyCount);
+    user.username = req.body.username;
+    user.department = Array.isArray(req.body.department)
+      ? req.body.department
+      : [req.body.department];
+    user.propertyCount = Number(req.body.propertyCount);
 
-      user
-        .save()
-        .then(() => res.json("User updated!"))
-        .catch((err) => res.status(400).json("Error: " + err));
-    })
-    .catch((err) => res.status(400).json("Error: " + err));
+    await user.save();
+    res.json("User updated!");
+  } catch (err) {
+    res.status(400).json("Error: " + err.message);
+  }
 });
 
-router.route("/:id").delete((req, res) => {
-  let id = new mongoose.Types.ObjectId(req.params.id);
-  NPIMSUser.findByIdAndDelete(id)
-    .then(() => res.json("User deleted."))
-    .catch((err) => res.status(400).json("Error: " + err));
+// DELETE user
+router.route("/:id").delete(async (req, res) => {
+  try {
+    const id = new mongoose.Types.ObjectId(req.params.id);
+    await NPIMSUser.findByIdAndDelete(id);
+    res.json("User deleted.");
+  } catch (err) {
+    res.status(400).json("Error: " + err.message);
+  }
 });
 
 module.exports = router;

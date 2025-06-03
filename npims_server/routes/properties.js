@@ -1,87 +1,125 @@
-const router = require("express").Router();
+const express = require("express");
+const router = express.Router();
 const mongoose = require("mongoose");
-let NPIMSProperty = require("../models/NPIMS_Property.model");
+const multer = require("multer");
+const path = require("path");
 
-// GET all properties
+const NPIMSProperty = require("../models/NPIMS_Property.model");
+const NPIMSUser = require("../models/NPIMS_User.model");
+
+// ==== Multer Configuration ====
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => cb(null, "uploads/"),
+  filename: (req, file, cb) => cb(null, Date.now() + "-" + file.originalname)
+});
+const upload = multer({ storage });
+
+// ==== Static File Serving for Uploaded Images ====
+router.use("/uploads", express.static("uploads"));
+
+// ==== GET All Properties ====
 router.route("/").get((req, res) => {
   NPIMSProperty.find()
+    .populate("staffInCharge", "username")
     .then((properties) => res.json(properties))
     .catch((err) => res.status(400).json("Error: " + err));
 });
 
-// GET property by ID
+// ==== GET Property by ID ====
 router.route("/:id").get((req, res) => {
   let id = new mongoose.Types.ObjectId(req.params.id);
   NPIMSProperty.findById(id)
+    .populate("staffInCharge", "username")
     .then((property) => res.json(property))
     .catch((err) => res.status(400).json("Error: " + err));
 });
 
-// ADD new property with initial history log
-router.route("/add").post((req, res) => {
-  const {
-    propertyNumber,
-    propertyType,
-    description,
-    acquisitionType,
-    dateAcquired,
-    unitPrice,
-    endUser,
-    location,
-    status
-  } = req.body;
+// ==== ADD New Property with Images & History ====
+router.route("/add").post(upload.array("images", 5), async (req, res) => {
+  try {
+    const {
+      propertyNumber,
+      propertyType,
+      article,
+      description,
+      acquisitionType,
+      dateAcquired,
+      unitPrice,
+      staffInCharge,
+      location,
+      status
+    } = req.body;
 
-  // Initial history log
-  const historyEntry = {
-    dateAssigned: dateAcquired,
-    location,
-    staffInCharge: endUser
-  };
+    const historyEntry = {
+      dateAssigned: dateAcquired,
+      location,
+      staffInCharge: staffInCharge,
+    };
 
-  const newProperty = new NPIMSProperty({
-    propertyNumber,
-    propertyType,
-    description,
-    acquisitionType,
-    dateAcquired,
-    unitPrice,
-    endUser,
-    location,
-    status,
-    historyLog: [historyEntry]
-  });
+    const imageFilenames = req.files ? req.files.map(file => file.filename) : [];
 
-  newProperty
-    .save()
-    .then(() => res.json("Property added with initial history log!"))
-    .catch((err) => res.status(400).json("Error: " + err));
+    const newProperty = new NPIMSProperty({
+      propertyNumber,
+      propertyType,
+      article,
+      description,
+      acquisitionType,
+      dateAcquired,
+      unitPrice,
+      staffInCharge,
+      location,
+      status,
+      images: imageFilenames,
+      historyLog: [historyEntry],
+    });
+
+    await newProperty.save();
+
+    if (Array.isArray(staffInCharge)) {
+      await NPIMSUser.updateMany(
+        { _id: { $in: staffInCharge } },
+        { $inc: { propertyCount: 1 } }
+      );
+    }
+
+    res.json("Property added with images and history log!");
+  } catch (err) {
+    res.status(400).json("Error: " + err.message);
+  }
 });
 
-// UPDATE property
-router.route("/update/:id").post((req, res) => {
+// ==== UPDATE Property ====
+router.route("/update/:id").post(upload.array("images", 5), (req, res) => {
   let id = new mongoose.Types.ObjectId(req.params.id);
+
   NPIMSProperty.findById(id)
     .then((property) => {
       property.propertyNumber = req.body.propertyNumber;
       property.propertyType = req.body.propertyType;
+      property.article = req.body.article;
       property.description = req.body.description;
       property.acquisitionType = req.body.acquisitionType;
       property.dateAcquired = new Date(req.body.dateAcquired);
       property.unitPrice = Number(req.body.unitPrice);
-      property.endUser = req.body.endUser;
+      property.staffInCharge = req.body.staffInCharge;
       property.location = req.body.location;
       property.status = req.body.status;
-      property.historyLog = req.body.historyLog;  
+      property.historyLog = JSON.parse(req.body.historyLog);
+
+      // Append new uploaded images if any
+      const imageFilenames = req.files ? req.files.map(file => file.filename) : [];
+      property.images = [...(property.images || []), ...imageFilenames];
 
       property
         .save()
-        .then(() => res.json("Property updated!"))
+        .then(() => res.json("Property updated with images!"))
         .catch((err) => res.status(400).json("Error: " + err));
     })
     .catch((err) => res.status(400).json("Error: " + err));
 });
 
-// DELETE property
+
+// ==== DELETE Property ====
 router.route("/:id").delete((req, res) => {
   let id = new mongoose.Types.ObjectId(req.params.id);
   NPIMSProperty.findByIdAndDelete(id)
@@ -89,7 +127,7 @@ router.route("/:id").delete((req, res) => {
     .catch((err) => res.status(400).json("Error: " + err));
 });
 
-// ADD history entry to a property
+// ==== ADD History Entry to Property ====
 router.route("/update-history/:id").post((req, res) => {
   let id = new mongoose.Types.ObjectId(req.params.id);
 

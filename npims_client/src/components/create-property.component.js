@@ -1,234 +1,229 @@
-import React, { Component } from "react";
-import axios from "axios";
-import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
+  import React, { Component } from "react";
+  import axios from "axios";
+  import DatePicker from "react-datepicker";
+  import "react-datepicker/dist/react-datepicker.css";
 
-export default class CreateProperty extends Component {
-  constructor(props) {
-    super(props);
+  export default class CreateProperty extends Component {
+    constructor(props) {
+      super(props);
 
-    this.onChangePropertyNumber = this.onChangePropertyNumber.bind(this);
-    this.onChangePropertyType = this.onChangePropertyType.bind(this);
-    this.onChangeDescription = this.onChangeDescription.bind(this);
-    this.onChangeAcquisitionType = this.onChangeAcquisitionType.bind(this);
-    this.onChangeDateAcquired = this.onChangeDateAcquired.bind(this);
-    this.onChangeUnitPrice = this.onChangeUnitPrice.bind(this);
-    this.onChangeEndUser = this.onChangeEndUser.bind(this);
-    this.onChangeLocation = this.onChangeLocation.bind(this);
-    this.onChangeStatus = this.onChangeStatus.bind(this);
-    this.onSubmit = this.onSubmit.bind(this);
+      this.state = {
+        propertyNumber: "",
+        propertyType: "",
+        article: "",
+        description: "",
+        acquisitionType: "",
+        dateAcquired: new Date(),
+        unitPrice: 0,
+        users: [],
+        staffInCharge: [""], 
+        location: "",
+        status: "",
+        images: [], // new
+      };
+    }
 
-    this.state = {
-      propertyNumber: "",
-      propertyType: "",
-      description: "",
-      acquisitionType: "",
-      dateAcquired: new Date(),
-      unitPrice: 0,
-      users: [],
-      endUser: "",  
-      location: "",
-      status: "",
-    };
-  }
+    componentDidMount() {
+      axios.get("/users/")
+        .then((response) => {
+          if (response.data.length > 0) {
+            this.setState({
+              users: response.data,
+            });
+          }
+        })
+        .catch((error) => console.log(error));
+    }
 
-  onChangePropertyNumber(e) {
-    this.setState({ propertyNumber: e.target.value });
-  }
-  onChangePropertyType(e) {
-    this.setState({ propertyType: e.target.value });
-  }
-  onChangeDescription(e) {
-    this.setState({ description: e.target.value });
-  }
-  onChangeAcquisitionType(e) {
-    this.setState({ acquisitionType: e.target.value });
-  }
-  onChangeDateAcquired(date) {
-    this.setState({ dateAcquired: date });
-  }
-  onChangeUnitPrice(e) {
-    // convert input to number (optional)
-    this.setState({ unitPrice: Number(e.target.value) });
-  }
-  onChangeEndUser(e) {
-    this.setState({ endUser: e.target.value });
-  }
-  onChangeLocation(e) {
-    this.setState({ location: e.target.value });
-  }
-  onChangeStatus(e) {
-    this.setState({ status: e.target.value });
-  }
-
-  onSubmit(e) {
-    e.preventDefault();
-
-    const property = {
-      propertyNumber: this.state.propertyNumber,
-      propertyType: this.state.propertyType,
-      description: this.state.description,
-      acquisitionType: this.state.acquisitionType,
-      dateAcquired: this.state.dateAcquired,
-      unitPrice: this.state.unitPrice,
-      endUser: this.state.endUser,
-      location: this.state.location,
-      status: this.state.status,
+    handleChange = (e) => {
+      this.setState({ [e.target.name]: e.target.value });
     };
 
-    console.log("Adding the property:", property);
+    handleDateChange = (date) => {
+      this.setState({ dateAcquired: date });
+    };
 
-    axios
-      .post("/properties/add", property)
-      .then((res) => {
-        console.log(res.data)
-        window.location.href = "/app"; // go to properties list
-      })
-      .catch((error) => console.error(error));
+    handleFileChange = (e) => {
+      this.setState({ images: Array.from(e.target.files) });
+    };
 
-  }
+    handleStaffChange = (index) => (e) => {
+      const value = e.target.value;
+      const staffInCharge = [...this.state.staffInCharge];
+      if (staffInCharge.includes(value)) return; // prevent duplicate
+      staffInCharge[index] = value;
+      this.setState({ staffInCharge });
+    };
 
-  componentDidMount() {
-    axios
-      .get("/users/")
-      .then((response) => {
-        if (response.data.length > 0) {
-          const firstUser = response.data[0].username;
-          this.setState({
-            users: response.data.map((user) => user.username),
-            endUser: firstUser,
-          });
-        }
-      })
-      .catch((error) => {
-        console.log(error);
+    addStaffField = () => {
+      this.setState((prev) => ({
+        staffInCharge: [...prev.staffInCharge, ""],
+      }));
+    };
+
+    removeStaffField = (index) => {
+      const staffInCharge = [...this.state.staffInCharge];
+      staffInCharge.splice(index, 1);
+      this.setState({ staffInCharge });
+    };
+
+
+
+    handleSubmit = (e) => {
+      e.preventDefault();
+
+      const formData = new FormData();
+      formData.append("propertyNumber", this.state.propertyNumber);
+      formData.append("propertyType", this.state.propertyType);
+      formData.append("article", this.state.article);
+      formData.append("description", this.state.description);
+      formData.append("acquisitionType", this.state.acquisitionType);
+      formData.append("dateAcquired", this.state.dateAcquired.toISOString());
+      formData.append("unitPrice", this.state.unitPrice);
+      this.state.staffInCharge.forEach((staffId) => {
+        formData.append("staffInCharge", staffId);
       });
-  }
+      formData.append("location", this.state.location);
+      formData.append("status", this.state.status);
 
-  render() {
-    console.log("Render State:", this.state);
-    return (
-      <div>
-        <h3>Add New Property</h3>
+      this.state.images.forEach((file) => {
+        formData.append("images", file);
+      });
 
-        <form onSubmit={this.onSubmit}>
-          <div className="form-group">
-            <label>Property Number: </label>
-            <input
-              type="text"
-              required
-              className="form-control"
-              value={this.state.propertyNumber}
-              onChange={this.onChangePropertyNumber}
-            />
-          </div>
+      axios.post("/properties/add", formData)
+        .then((res) => {
+          console.log(res.data);
+          window.location.href = "/app";
+        })
+        .catch((error) => console.error(error));
+    };
 
-          <div className="form-group">
-            <label>Property Type: </label>
-            <input
-              type="text"
-              required
-              className="form-control"
-              value={this.state.propertyType}
-              onChange={this.onChangePropertyType}
-            />
-          </div>
+    render() {
+      const { propertyType, article, acquisitionType, location, users, staffInCharge } = this.state;
 
-          <div className="form-group">
-            <label>Description: </label>
-            <input
-              type="text"
-              required
-              className="form-control"
-              value={this.state.description}
-              onChange={this.onChangeDescription}
-            />
-          </div>
+      const electronicArticles = ["Computer - Windows", "Computer - Mac", "Laptop", "Tablet", "Projector", "Printer", "Barcode Scanner", "Book Scanner", "UPS", "Aircon", "TV", "Flashdrive", "Camera", "Others"];
+      const nonElectronicArticles = ["Conference Table", "Center Table", "Computer Table", "Chair", "Stool Chair", "Cabinet", "Card Catalog", "Others"];
+      const articleOptions =
+        propertyType === "Electronic" ? electronicArticles :
+        propertyType === "Non-electronic" ? nonElectronicArticles : [];
+      const acquisitionTypes = ["PAR", "ICS"];
+      const statusTypes = ["Active", "For Repair", "Unserviceable", "Condemned"];
+      const locations = [
+        "Main Library - Acquisitions Section", 
+        "Main Library - Cataloging and Classification Section",
+        "Main Library - Financial and Administrative Section",
+        "Main Library - General References and Information Services Section",
+        "Main Library - E-Resources and Multimedia Services Section",
+        "Main Library - Filipiniana and Serials Section",
+        "Main Library - University Archives and Knowledge Repository Section",
+        "Main Library - Office of the University Librarian",
+        "Others"];
 
-          <div className="form-group">
-            <label>Acquisition Type: </label>
-            <input
-              type="text"
-              required
-              className="form-control"
-              value={this.state.acquisitionType}
-              onChange={this.onChangeAcquisitionType}
-            />
-          </div>
-
-          <div className="form-group">
-            <label>Date Acquired: </label>
-            <div>
-              <DatePicker
-                dateFormat="yyyy/MM/dd"
-                selected={this.state.dateAcquired}
-                onChange={this.onChangeDateAcquired}
-              />
+      return (
+        <div>
+          <h3>Add New Property</h3>
+          <form onSubmit={this.handleSubmit} encType="multipart/form-data">
+            <div className="form-group">
+              <label>Staff In Charge:</label>
+              {this.state.staffInCharge.map((staff, index) => (
+                <div key={index} className="d-flex mb-2">
+                  <select
+                    required
+                    className="form-control"
+                    value={staff}
+                    onChange={this.handleStaffChange(index)}
+                  >
+                    <option value="">Select Staff</option>
+                    {users.map((user) => (
+                      <option
+                        key={user._id}
+                        value={user._id}
+                        disabled={this.state.staffInCharge.includes(user._id) && user._id !== staff}
+                      >
+                        {user.username}
+                      </option>
+                    ))}
+                  </select>
+                  {this.state.staffInCharge.length > 1 && (
+                    <button type="button" onClick={() => this.removeStaffField(index)} className="btn btn-danger btn-sm ml-2">X</button>
+                  )}
+                </div>
+              ))}
+              <button type="button" className="btn btn-secondary btn-sm mt-1" onClick={this.addStaffField}>Add Staff</button>
             </div>
-          </div>
 
-          <div className="form-group">
-            <label>Unit Price: </label>
-            <input
-              type="number"
-              required
-              className="form-control"
-              value={this.state.unitPrice}
-              onChange={this.onChangeUnitPrice}
-            />
-          </div>
 
-          <div className="form-group">
-            <label>End User: </label>
-            {this.state.users.length === 0 ? (
-              <p>Loading users...</p>
-            ) : (
-              <select
-                required
-                className="form-control"
-                value={this.state.endUser}
-                onChange={this.onChangeEndUser}
-              >
-                {this.state.users.map((user) => (
-                  <option key={user} value={user}>
-                    {user}
-                  </option>
-                ))}
+            <div className="form-group">
+              <label>Location:</label>
+              <select required className="form-control" name="location" value={location} onChange={this.handleChange}>
+                <option value="">Select Location</option>
+                {locations.map((loc) => <option key={loc} value={loc}>{loc}</option>)}
               </select>
-            )}
-          </div>
+            </div>
 
-          <div className="form-group">
-            <label>Location: </label>
-            <input
-              type="text"
-              required
-              className="form-control"
-              value={this.state.location}
-              onChange={this.onChangeLocation}
-            />
-          </div>
+            <div className="form-group">
+              <label>Property Number:</label>
+              <input type="text" required className="form-control" name="propertyNumber" value={this.state.propertyNumber} onChange={this.handleChange} />
+            </div>
 
-          <div className="form-group">
-            <label>Status: </label>
-            <input
-              type="text"
-              required
-              className="form-control"
-              value={this.state.status}
-              onChange={this.onChangeStatus}
-            />
-          </div>
+            <div className="form-group">
+              <label>Property Type:</label>
+              <select required className="form-control" name="propertyType" value={propertyType} onChange={this.handleChange}>
+                <option value="">Select Property Type</option>
+                <option value="Electronic">Electronic</option>
+                <option value="Non-electronic">Non-electronic</option>
+              </select>
+            </div>
 
-          <div className="form-group">
-            <input
-              type="submit"
-              value="Add New Property"
-              className="btn btn-primary"
-            />
-          </div>
-        </form>
-      </div>
-    );
+            <div className="form-group">
+              <label>Article:</label>
+              <select required className="form-control" name="article" value={article} onChange={this.handleChange}>
+                <option value="">Select Article</option>
+                {articleOptions.map((a) => <option key={a} value={a}>{a}</option>)}
+              </select>
+            </div>
+
+            <div className="form-group">
+              <label>Description:</label>
+              <input type="text" required className="form-control" name="description" value={this.state.description} onChange={this.handleChange} />
+            </div>
+
+            <div className="form-group">
+              <label>Acquisition Type:</label>
+              <select required className="form-control" name="acquisitionType" value={acquisitionType} onChange={this.handleChange}>
+                <option value="">Select Type</option>
+                {acquisitionTypes.map((type) => <option key={type} value={type}>{type}</option>)}
+              </select>
+            </div>
+
+            <div className="form-group">
+              <label>Date Acquired:</label>
+              <DatePicker dateFormat="yyyy/MM/dd" selected={this.state.dateAcquired} onChange={this.handleDateChange} />
+            </div>
+
+            <div className="form-group">
+              <label>Unit Price:</label>
+              <input type="number" required className="form-control" name="unitPrice" value={this.state.unitPrice} onChange={this.handleChange} />
+            </div>
+
+            <div className="form-group">
+              <label>Status:</label>
+              <select required className="form-control" name="status" value={this.state.status} onChange={this.handleChange}>
+                <option value="">Select Status</option>
+                {statusTypes.map((type) => <option key={type} value={type}>{type}</option>)}
+              </select>
+            </div>
+
+            <div className="form-group">
+              <label>Images:</label>
+              <input type="file" className="form-control" multiple onChange={this.handleFileChange} />
+            </div>
+
+            <div className="form-group">
+              <input type="submit" value="Add New Property" className="btn btn-primary" />
+            </div>
+          </form>
+        </div>
+      );
+    }
   }
-}

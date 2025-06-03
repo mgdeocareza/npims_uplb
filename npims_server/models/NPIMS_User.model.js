@@ -10,10 +10,11 @@ const NPIMSUserSchema = new mongoose.Schema(
       unique: true,
       trim: true,
     },
-    department: {
+    department: [{
       type: String,
       required: true,
-    },
+      enum: ["Office of the University Librarian", "Acquisitions Section", "Cataloging and Classification Section", "Financial and Administrative Section", "General References and Information Services Section", "E-Resources and Multimedia Services Section", "Filipiniana and Serials Section", "University Archives and Knowledge Repository Section", "Others"],
+    }],
     propertyCount: {
       type: Number,
       required: true,

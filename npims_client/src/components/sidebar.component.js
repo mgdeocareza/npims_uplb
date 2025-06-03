@@ -6,16 +6,17 @@ export default function Sidebar({ collapsed }) {
   const role = localStorage.getItem("userRole");
 
   const allMenuItems = [
-    { to: "/app", label: "View All Properties" },
+    { to: "/app/dashboard", label: "Dashboard" },
+    { to: "/app", label: "View All Properties" },    
     { to: "/app/filter-by-material", label: "View by Material Type" },
     { to: "/app/filter-by-acquisition", label: "View by Acquisition Type" },
     { to: "/app/filter-by-staff", label: "View by Staff In Charge" },
     { to: "/app/filter-by-location", label: "View by Assigned Location" },
     { to: "/app/create", label: "Add New Property" },
-    { to: "/app/user", label: "Create User" },
+    { to: "/app/user", label: "Add New Staff" },
   ];
 
-  const menuItems = role === "admin" ? allMenuItems : allMenuItems.slice(0, 3);
+  const menuItems = role === "admin" ? allMenuItems : allMenuItems.slice(0, 4);
 
   const lineColor = "#444c52";
 

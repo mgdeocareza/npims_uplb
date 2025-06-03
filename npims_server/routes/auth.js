@@ -3,8 +3,8 @@ const router = express.Router();
 
 // Static list of users (replace with your real 50 pairs)
 const users = [
-  { username: 'admin1', password: 'admin2025!', role: 'admin' },
-  { username: 'admin2', password: 'admin2025!', role: 'admin' },  
+  { username: 'admin1', password: 'admin1', role: 'admin' },
+  { username: 'admin2', password: 'admin2', role: 'admin' },  
   { username: 'user1', password: 'pass1', role: 'user' },
   { username: 'user2', password: 'pass2', role: 'user' },
   { username: 'user3', password: 'pass3', role: 'user'  },

@@ -1,5 +1,5 @@
 .login-page {
-  background: url('../images/mainlib_cover.jpg') no-repeat center center fixed;
+  background: url('../images/main lib aerial cover.png') no-repeat center center fixed;
   background-size: 100% 100%;
   min-height: 100vh;
   display: flex;
@@ -8,5 +8,7 @@
 }
 
 .login-box {
-  width: 400px;
+  max-width: 400px;
+  width: 100%;
+  margin: auto;
 }

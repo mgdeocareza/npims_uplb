@@ -2,7 +2,8 @@ import React, { useState } from "react";
 import "./login.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { FaUser, FaLock } from "react-icons/fa";
-import logo from "../images/npims2025.png";
+import logo from "../images/NPIMS LOGO 2025_a.png";
+import logo2 from "../images/3.png";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
@@ -14,27 +15,25 @@ const Login = () => {
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    console.log("Login attempt started");  
-
     setError("");
+    console.log("Login attempt started");
 
     try {
-      const res = await axios.post("/login", {
-        username,
-        password,
-      }, {
-        withCredentials: true // if using cookies or sessions
-      });
+      const res = await axios.post(
+        "/login",
+        { username, password },
+        { withCredentials: true }
+      );
 
-      console.log("Response from backend:", res.data);  
+      console.log("Response from backend:", res.data);
 
       if (res.data.message === "Login successful") {
         localStorage.setItem("userRole", res.data.role);
-        localStorage.setItem("username", username); 
+        localStorage.setItem("username", username);
         navigate("/app");
       }
     } catch (err) {
-      console.log("Login error:", err);  
+      console.log("Login error:", err);
       setError(err.response?.data?.message || "Login failed");
     }
   };
@@ -42,12 +41,19 @@ const Login = () => {
   return (
     <div className="login-page">
       <div className="login-box">
-        <div className="card border-dark shadow">
-          <div className="card-header text-center bg-white">
-            <img src={logo} alt="NPIMS Logo" width="300" height="150" />
+        <div className="card border-dark shadow" style={{ width: "355px" }}>
+          <div className="card-header text-center bg-white" style={{ height: "300px" }}>
+            <img src={logo} alt="NPIMS Logo" width="320" height="280" />
           </div>
           <div className="card-body">
-            <h2 className="login-box-msg text-center">Sign in to NPIMS</h2>
+            <div className="text-center mb-4">
+              <img
+                src={logo2}
+                alt="NPIMS Text Logo"
+                style={{ height: "3em", marginBottom: "0.25em" }}
+              />
+              <h3 className="mb-0">Sign In</h3>
+            </div>
 
             <form onSubmit={handleLogin}>
               <div className="input-group mb-3">
@@ -59,12 +65,17 @@ const Login = () => {
                   onChange={(e) => setUsername(e.target.value)}
                   required
                   autoFocus
+                  style={{ height: 'calc(1.5em + .75rem + 2px)', borderRight: 'none' }}
                 />
-                <div className="input-group-append">
-                  <div className="input-group-text">
-                    <FaUser />
-                  </div>
-                </div>
+                <span
+                className="input-group-text"
+                style={{
+                  backgroundColor: '#e9ecef', // Very light gray 
+                  color: '#343a40',           // Dark gray (Bootstrap gray-800)
+                  borderLeft: '1px solid #ced4da'
+                }}>
+                  <FaUser style={{ fontSize: '1.2em' }} />
+                </span>
               </div>
 
               <div className="input-group mb-3">
@@ -75,30 +86,29 @@ const Login = () => {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
+                  style={{ height: 'calc(1.5em + .75rem + 2px)', borderRight: 'none' }}
                 />
-                <div className="input-group-append">
-                  <div className="input-group-text">
-                    <FaLock />
-                  </div>
-                </div>
+                <span
+                className="input-group-text"
+                style={{
+                  backgroundColor: '#e9ecef', // Very light gray 
+                  color: '#343a40',           // Dark gray (Bootstrap gray-800)
+                  borderLeft: '1px solid #ced4da'
+                }}>                  
+                  <FaLock style={{ fontSize: '1.2em' }} />
+                </span>
               </div>
 
-              <div className="row mb-3">
-                <div className="col-8 d-flex align-items-center">
-                  <input type="checkbox" id="remember" className="mr-2" />
-                  <label htmlFor="remember">Remember Me</label>
-                </div>
-                <div className="col-4">
-                  <button type="submit" className="btn btn-dark btn-block w-100">
-                    Sign In!
-                  </button>
-                </div>
+              <div className="text-center mb-3">
+                <button type="submit" className="btn btn-dark px-5">
+                  Sign In
+                </button>
               </div>
+
+
 
               {error && (
-                <div className="alert alert-danger text-center mt-2">
-                  {error}
-                </div>
+                <div className="alert alert-danger text-center mt-2">{error}</div>
               )}
             </form>
           </div>

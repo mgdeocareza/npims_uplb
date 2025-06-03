@@ -5,6 +5,8 @@ import '@fortawesome/fontawesome-free/css/all.min.css';
 
 import Navbar from "./components/navbar.component";
 import Sidebar from "./components/sidebar.component";
+import Dashboard from "./components/dashboard.component";
+import PropertiesFilteredByArticle from "./components/filter-by-article.component";
 import PropertiesList from "./components/properties-list.component";
 import PropertiesFilteredByMaterial from "./components/filter-by-material.component";
 import PropertiesFilteredByAcquisition from "./components/filter-by-acquisition.component";
@@ -51,6 +53,8 @@ function App() {
                   <div className="container-fluid mt-4">
                     <Routes>
                       <Route path="/" element={<PropertiesList showAll={true} />} />
+                      <Route path="/dashboard" element={<Dashboard />} />
+                      <Route path="/filter-by-article/:article" element={<PropertiesFilteredByArticle />} />
                       <Route path="/filter-by-material" element={<PropertiesFilteredByMaterial />} />
                       <Route path="/filter-by-acquisition" element={<PropertiesFilteredByAcquisition />} />
                       <Route path="/filter-by-staff" element={<PropertiesFilteredByStaff />} />

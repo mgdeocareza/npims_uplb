@@ -36,3 +36,17 @@
     transform: rotate(360deg);
   }
 }
+
+#propertiesTable th.sorting,
+#propertiesTable th.sorting_asc,
+#propertiesTable th.sorting_desc {
+  text-align: left !important;
+  padding-right: 20px !important; /* Give space for the arrow */
+}
+
+#propertiesTable th.sorting::after,
+#propertiesTable th.sorting_asc::after,
+#propertiesTable th.sorting_desc::after {
+  float: right !important; /* Force the arrow to the right */
+  margin-left: 5px;
+}

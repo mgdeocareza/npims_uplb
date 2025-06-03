@@ -1,0 +1,4 @@
+/* Override right align for body cells only */
+#propertiesTable.dataTable tbody td.dt-body-right {
+  text-align: left !important;
+}
