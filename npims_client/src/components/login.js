@@ -29,8 +29,14 @@ const Login = () => {
 
       if (res.data.message === "Login successful") {
         localStorage.setItem("userRole", res.data.role);
+<<<<<<< HEAD
         localStorage.setItem("username", username);
+=======
+        localStorage.setItem("username", username); 
+        console.log("Redirecting to /app");
+>>>>>>> d3fa72d7c03aabf992b4fa2e12bc831b3ab8d178
         navigate("/app");
+        console.log("navigate called");
       }
     } catch (err) {
       console.log("Login error:", err);
@@ -99,10 +105,23 @@ const Login = () => {
                 </span>
               </div>
 
+<<<<<<< HEAD
               <div className="text-center mb-3">
                 <button type="submit" className="btn btn-dark px-5">
                   Sign In
                 </button>
+=======
+              <div className="row mb-3">
+                <div className="col-8 d-flex align-items-center">
+                  <input type="checkbox" id="remember" className="mr-2" />
+                  <label htmlFor="remember">Remember Me</label>
+                </div>
+                <div className="col-4">
+                  <button type="submit" className="btn btn-dark btn-block w-100">
+                    Sign In
+                  </button>
+                </div>
+>>>>>>> d3fa72d7c03aabf992b4fa2e12bc831b3ab8d178
               </div>
 
 
