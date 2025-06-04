@@ -49,7 +49,6 @@ const NPIMSProperty = ({ property, deleteProperty, role, columns, userMap }) => 
 
       if (col === "dateAcquired") {
         value = value?.substring(0, 10);
-        console.log(`Type of ${col}:`, typeof value);
       }
 
       if (col === "staffInCharge") {
@@ -66,18 +65,22 @@ const NPIMSProperty = ({ property, deleteProperty, role, columns, userMap }) => 
         </td>
       );
     })}
-    {role === 'admin' && (
-      <td style={{ textAlign: 'left' }}>
-        <Link to={`/app/view/${property._id}`}>view</Link> |{" "}
-        <Link to={`/app/edit/${property._id}`}>edit</Link> |{" "}
-        <a href="#" onClick={(e) => {
-          e.preventDefault();
-          if (window.confirm("Are you sure you want to delete?")) {
-            deleteProperty(property._id);
-          }
-        }}>delete</a>
-      </td>
-    )}
+    <td style={{ textAlign: 'left' }}>
+      <Link to={`/app/view/${property._id}`}>view</Link>
+      {role === 'admin' && (
+        <>
+          {" | "}
+          <Link to={`/app/edit/${property._id}`}>edit</Link>
+          {" | "}
+          <a href="#" onClick={(e) => {
+            e.preventDefault();
+            if (window.confirm("Are you sure you want to delete?")) {
+              deleteProperty(property._id);
+            }
+          }}>delete</a>
+        </>
+      )}
+    </td>
   </tr>
 );
 
@@ -177,13 +180,9 @@ export default class PropertiesList extends Component {
   propertyList(columns, userMap) {
     let filtered = this.state.properties;
 
-    console.log("loginUsername:", this.loginUsername);
     const fullName = LOGIN_TO_FULLNAME_MAP[this.loginUsername];
-    console.log("Mapped fullName:", fullName);
     const loggedInUser = this.state.users.find(u => u.username === fullName || u.fullName === fullName);
-    console.log("Found loggedInUser:", loggedInUser);
     const loggedInUserId = loggedInUser ? loggedInUser._id : null;
-    console.log("!!! loggedInUserId:", loggedInUserId);
 
     if (this.props.article) {
       filtered = filtered.filter(p => p.article === this.props.article);
@@ -241,7 +240,7 @@ export default class PropertiesList extends Component {
                   {COLUMN_LABELS[col] || col}
                 </th>
               ))}
-              {role === 'admin' && <th style={{ textAlign: 'left' }}>Action</th>}
+              <th style={{ textAlign: 'left' }}>Action</th>
             </tr>
           </thead>
           <tbody>{this.propertyList(activeColumns, userMap)}</tbody>
