@@ -19,6 +19,22 @@ const COLUMN_LABELS = {
   status: "Status"
 };
 
+const LOGIN_TO_FULLNAME_MAP = {
+  mmingua: "Mary Ann M. Ingua",
+  psmurillo: "Pius S. Murillo",
+  mraltiche: "Maria Victoria R. Altiche",
+  aocatelo: "Armando O. Catelo",
+  aabueno: "Angeline A. Bueno",
+  ildelossantos: "Irene L. Delos Santos",
+  mspanday: "Myra S. Panday",
+  cgbalmes: "Christine G. Balmes",
+  ahconcibido: "Arnel H. Concibido",
+  vpalcantara: "Virginia P. Alcantara",
+  esdaradar: "Ella Marie S. Daradar",
+  elsadrescalante: "Elsa DR. Escalante",
+  romacgelloani: "Roma C. Gelloani"
+};
+
 const COLUMN_SETS = {
   default: ["propertyNumber", "propertyType", "article", "description", "acquisitionType", "dateAcquired", "unitPrice", "staffInCharge", "location", "status"],
   viewAllFiltered: ["propertyNumber", "article", "dateAcquired", "unitPrice","staffInCharge", "location", "status"],
@@ -73,6 +89,7 @@ export default class PropertiesList extends Component {
       users: [],
       role: localStorage.getItem("userRole") || "user",
     };
+    this.loginUsername = localStorage.getItem("loginUsername");
     this.deleteProperty = this.deleteProperty.bind(this);
   }
 
@@ -160,6 +177,14 @@ export default class PropertiesList extends Component {
   propertyList(columns, userMap) {
     let filtered = this.state.properties;
 
+    console.log("loginUsername:", this.loginUsername);
+    const fullName = LOGIN_TO_FULLNAME_MAP[this.loginUsername];
+    console.log("Mapped fullName:", fullName);
+    const loggedInUser = this.state.users.find(u => u.username === fullName || u.fullName === fullName);
+    console.log("Found loggedInUser:", loggedInUser);
+    const loggedInUserId = loggedInUser ? loggedInUser._id : null;
+    console.log("!!! loggedInUserId:", loggedInUserId);
+
     if (this.props.article) {
       filtered = filtered.filter(p => p.article === this.props.article);
     }
@@ -174,6 +199,16 @@ export default class PropertiesList extends Component {
     }
     if (this.props.location) {
       filtered = filtered.filter(p => p.location === this.props.location);
+    }
+
+    if (this.state.role !== 'admin' && loggedInUserId) {
+      filtered = filtered.filter(p => {
+        if (Array.isArray(p.staffInCharge)) {
+          return p.staffInCharge.includes(loggedInUserId);
+        } else {
+          return p.staffInCharge === loggedInUserId;
+        }
+      });
     }
 
     return filtered.map((property) => (
