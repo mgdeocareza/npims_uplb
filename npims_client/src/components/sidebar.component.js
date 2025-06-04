@@ -24,7 +24,7 @@ export default function Sidebar({ collapsed, onLogout }) {
   // Store icon components (not JSX elements)
   const allMenuItems = [
     { to: "/app/dashboard", label: "Dashboard", icon: FaTh },
-    { to: "/app", label: "View All Properties", icon: FaClipboardList },
+    { to: "/app/", label: "View All Properties", icon: FaClipboardList },
     { to: "/app/filter-by-material", label: "View By Material Type", icon: FaLayerGroup },
     { to: "/app/filter-by-acquisition", label: "View By Acquisition Type", icon: FaFileContract },
     { to: "/app/filter-by-staff", label: "View By Staff In Charge", icon: FaUserTie },

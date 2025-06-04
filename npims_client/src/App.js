@@ -109,7 +109,10 @@ function App() {
           }
         />
 
-        <Route path="/" element={<Navigate to="/login" replace />} />
+        <Route
+          path="/"
+          element={isLoggedIn ? <Navigate to="/app/dashboard" replace /> : <Navigate to="/login" replace />}
+        />
       </Routes>
     </Router>
   );

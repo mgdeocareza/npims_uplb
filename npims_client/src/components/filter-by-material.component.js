@@ -10,10 +10,23 @@ export default function FilterByMaterial() {
 
   return (
     <div>
-      <h3>Filter Properties by Material Type</h3>
+      <div
+        style={{
+          backgroundColor: "#f2dede",
+          color: "#7b1113",
+          padding: "10px 20px",
+          borderRadius: "8px",
+          fontSize: "1.4rem",
+          fontWeight: "bold",
+          letterSpacing: "0.5px",
+          textAlign: "left",
+        }}
+      >
+        Filter Properties by Material Type
+      </div>
 
       {/* Radio filter UI */}
-      <div style={{ marginBottom: '20px' }}>
+      <div style={{ margin:'20px' }}>
         <label>
           <input
             type="radio"

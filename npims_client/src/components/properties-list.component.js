@@ -38,7 +38,7 @@ const LOGIN_TO_FULLNAME_MAP = {
 const COLUMN_SETS = {
   default: ["propertyNumber", "propertyType", "article", "description", "acquisitionType", "dateAcquired", "unitPrice", "staffInCharge", "location", "status"],
   viewAllFiltered: ["propertyNumber", "article", "dateAcquired", "unitPrice","staffInCharge", "location", "status"],
-  filterByArticle: ["propertyNumber", "article", "description", "acquisitionType", "dateAcquired", "staffInCharge", "location", "status"],
+  filterByArticle: ["propertyNumber", "description", "dateAcquired", "unitPrice", "staffInCharge", "location", "status"],
   filterByAcquisition: ["propertyNumber", "article", "acquisitionType", "dateAcquired", "unitPrice", "staffInCharge", "location", "status"]
 };
 
@@ -60,8 +60,8 @@ const NPIMSProperty = ({ property, deleteProperty, role, columns, userMap }) => 
       }
 
       return (
-        <td key={col} style={{textAlign: col === 'unitPrice' ? 'right' : 'left' }}>
-          {value}
+        <td key={col} style={{ textAlign: col === 'unitPrice' ? 'right' : 'left' }}>
+          {col === 'unitPrice' && typeof value === 'number' ? value.toFixed(2) : value}
         </td>
       );
     })}
@@ -110,6 +110,8 @@ export default class PropertiesList extends Component {
 
     const style = document.createElement('style');
     style.innerHTML = `
+
+
       #propertiesTable th.sorting,
       #propertiesTable th.sorting_asc,
       #propertiesTable th.sorting_desc {
@@ -160,13 +162,13 @@ export default class PropertiesList extends Component {
           type: 'string',  
           className: 'dt-body-left'  
         },
-        { width: '150px', targets: 0 },
+        { width: '180px', targets: 0 },
         { width: '170px', targets: 1 },
         { width: '120px', targets: 2 },
-        { width: '120px', targets: 3 },
+        { width: '100px', targets: 3 },
         { width: '170px', targets: 4 },
-        { width: '210px', targets: 5 },
-        { width: '100px', targets: 6 },
+        { width: '170px', targets: 5 },
+        // { width: '100px', targets: 6 },
       ]
     });
   }
@@ -229,10 +231,36 @@ export default class PropertiesList extends Component {
     const userMap = Object.fromEntries(users.map(user => [user._id, user.username]));
 
     return (
-      <div>
-        {showAll && <h3>All Properties</h3>}
+      <>
+      {showAll && 
+      <div
+        style={{
+          backgroundColor: "#f2dede",
+          color: "#7b1113",
+          padding: "10px 20px",
+          borderRadius: "8px",
+          fontSize: "1.4rem",
+          fontWeight: "bold",
+          letterSpacing: "0.5px",
+          textAlign: "left",
+        }}
+      >
+      All Properties
+      </div>
+      }
 
-        <table id="propertiesTable" className="display">
+      <div
+        style={{
+          maxWidth: 1180,     // Same max width as Dashboard container
+          marginLeft: "auto",
+          marginRight: "auto",
+          padding: "0 10px",
+          overflowX: "auto",   
+        }}
+      >
+
+
+        <table id="propertiesTable" className="display" style={{ width: "100%" }}>
           <thead className="thead-light">
             <tr>
               {activeColumns.map(col => (
@@ -246,6 +274,7 @@ export default class PropertiesList extends Component {
           <tbody>{this.propertyList(activeColumns, userMap)}</tbody>
         </table>
       </div>
+      </>
     );
   }
 }
