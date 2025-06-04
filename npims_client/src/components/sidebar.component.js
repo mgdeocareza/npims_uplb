@@ -116,7 +116,7 @@ export default function Sidebar({ collapsed, onLogout }) {
                     size={collapsed ? 22 : 20}
                     style={{ margin: "5 0px" }}
                   />
-                  {!collapsed && <span style={{ paddingLeft: "5px" }}>{item.label}</span>}
+                  {!collapsed && <span style={{ paddingLeft: "5px"}}>{item.label}</span>}
                 </Link>
               </li>
             );

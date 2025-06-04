@@ -1,6 +1,16 @@
 /* .App {
   text-align: center;
 } */
+body {
+  font-family: 'Nunito';
+  font-size: 15px;
+  font-weight: 400;  /* normal */
+}
+
+h1, h2, h3 {
+  font-weight: 600;  /* semi-bold */
+}
+
 
 .App-logo {
   height: 40vmin;

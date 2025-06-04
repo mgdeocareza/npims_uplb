@@ -120,9 +120,10 @@
         "Others"];
 
       return (
-        <div>
+        <div className="container mt-3">
           <h3>Add New Property</h3>
           <form onSubmit={this.handleSubmit} encType="multipart/form-data">
+
             <div className="form-group">
               <label>Staff In Charge:</label>
               {this.state.staffInCharge.map((staff, index) => (
@@ -152,66 +153,93 @@
               <button type="button" className="btn btn-secondary btn-sm mt-1" onClick={this.addStaffField}>Add Staff</button>
             </div>
 
-
             <div className="form-group">
               <label>Location:</label>
-              <select required className="form-control" name="location" value={location} onChange={this.handleChange}>
+              <select required className="form-control" name="location" value={this.state.location} onChange={this.handleChange}>
                 <option value="">Select Location</option>
                 {locations.map((loc) => <option key={loc} value={loc}>{loc}</option>)}
               </select>
             </div>
 
-            <div className="form-group">
-              <label>Property Number:</label>
-              <input type="text" required className="form-control" name="propertyNumber" value={this.state.propertyNumber} onChange={this.handleChange} />
-            </div>
+            <div className="row">
+              <div className="col-md-6">
+                <div className="form-group">
+                  <label>Property Number:</label>
+                  <input type="text" required className="form-control" name="propertyNumber" value={this.state.propertyNumber} onChange={this.handleChange} />
+                </div>
+              </div>
 
-            <div className="form-group">
-              <label>Property Type:</label>
-              <select required className="form-control" name="propertyType" value={propertyType} onChange={this.handleChange}>
-                <option value="">Select Property Type</option>
-                <option value="Electronic">Electronic</option>
-                <option value="Non-electronic">Non-electronic</option>
-              </select>
-            </div>
+              <div className="col-md-6">
+                <div className="form-group">
+                  <label>Property Type:</label>
+                  <select required className="form-control" name="propertyType" value={propertyType} onChange={this.handleChange}>
+                    <option value="">Select Property Type</option>
+                    <option value="Electronic">Electronic</option>
+                    <option value="Non-electronic">Non-electronic</option>
+                  </select>
+                </div>
+              </div>
 
-            <div className="form-group">
-              <label>Article:</label>
-              <select required className="form-control" name="article" value={article} onChange={this.handleChange}>
-                <option value="">Select Article</option>
-                {articleOptions.map((a) => <option key={a} value={a}>{a}</option>)}
-              </select>
+              <div className="col-md-6">
+                <div className="form-group">
+                  <label>Article:</label>
+                  <select required className="form-control" name="article" value={article} onChange={this.handleChange}>
+                    <option value="">Select Article</option>
+                    {articleOptions.map((a) => <option key={a} value={a}>{a}</option>)}
+                  </select>
+                </div>
+              </div>
+
+              <div className="col-md-6">
+                <div className="form-group">
+                  <label>Acquisition Type:</label>
+                  <select required className="form-control" name="acquisitionType" value={this.state.acquisitionType} onChange={this.handleChange}>
+                    <option value="">Select Type</option>
+                    {acquisitionTypes.map((type) => <option key={type} value={type}>{type}</option>)}
+                  </select>
+                </div>
+              </div>
+
+              <div className="col-md-6">
+                <div className="form-group">
+                  <label>Date Acquired:</label>
+                  <DatePicker
+                    className="form-control"
+                    dateFormat="yyyy/MM/dd"
+                    selected={this.state.dateAcquired}
+                    onChange={this.handleDateChange}
+                  />
+                </div>
+              </div>
+
+              <div className="col-md-6">
+                <div className="form-group">
+                  <label>Unit Price:</label>
+                  <input type="number" required className="form-control" name="unitPrice" value={this.state.unitPrice} onChange={this.handleChange} />
+                </div>
+              </div>
+
+              <div className="col-md-6">
+                <div className="form-group">
+                  <label>Status:</label>
+                  <select required className="form-control" name="status" value={this.state.status} onChange={this.handleChange}>
+                    <option value="">Select Status</option>
+                    {statusTypes.map((type) => <option key={type} value={type}>{type}</option>)}
+                  </select>
+                </div>
+              </div>
             </div>
 
             <div className="form-group">
               <label>Description:</label>
-              <input type="text" required className="form-control" name="description" value={this.state.description} onChange={this.handleChange} />
-            </div>
-
-            <div className="form-group">
-              <label>Acquisition Type:</label>
-              <select required className="form-control" name="acquisitionType" value={acquisitionType} onChange={this.handleChange}>
-                <option value="">Select Type</option>
-                {acquisitionTypes.map((type) => <option key={type} value={type}>{type}</option>)}
-              </select>
-            </div>
-
-            <div className="form-group">
-              <label>Date Acquired:</label>
-              <DatePicker dateFormat="yyyy/MM/dd" selected={this.state.dateAcquired} onChange={this.handleDateChange} />
-            </div>
-
-            <div className="form-group">
-              <label>Unit Price:</label>
-              <input type="number" required className="form-control" name="unitPrice" value={this.state.unitPrice} onChange={this.handleChange} />
-            </div>
-
-            <div className="form-group">
-              <label>Status:</label>
-              <select required className="form-control" name="status" value={this.state.status} onChange={this.handleChange}>
-                <option value="">Select Status</option>
-                {statusTypes.map((type) => <option key={type} value={type}>{type}</option>)}
-              </select>
+              <textarea
+                required
+                className="form-control"
+                rows={4}
+                name="description"
+                value={this.state.description}
+                onChange={this.handleChange}
+              ></textarea>
             </div>
 
             <div className="form-group">
@@ -219,11 +247,12 @@
               <input type="file" className="form-control" multiple onChange={this.handleFileChange} />
             </div>
 
-            <div className="form-group">
+            <div className="form-group text-right">
               <input type="submit" value="Add New Property" className="btn btn-primary" />
             </div>
           </form>
         </div>
+
       );
     }
   }

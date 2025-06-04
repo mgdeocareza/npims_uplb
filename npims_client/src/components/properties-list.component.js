@@ -21,7 +21,7 @@ const COLUMN_LABELS = {
 
 const COLUMN_SETS = {
   default: ["propertyNumber", "propertyType", "article", "description", "acquisitionType", "dateAcquired", "unitPrice", "staffInCharge", "location", "status"],
-  viewAllFiltered: ["propertyNumber", "propertyType", "article", "acquisitionType", "dateAcquired", "staffInCharge", "location", "status"],
+  viewAllFiltered: ["propertyNumber", "article", "dateAcquired", "unitPrice","staffInCharge", "location", "status"],
   filterByArticle: ["propertyNumber", "article", "description", "acquisitionType", "dateAcquired", "staffInCharge", "location", "status"],
   filterByAcquisition: ["propertyNumber", "article", "acquisitionType", "dateAcquired", "unitPrice", "staffInCharge", "location", "status"]
 };
@@ -45,7 +45,7 @@ const NPIMSProperty = ({ property, deleteProperty, role, columns, userMap }) => 
       }
 
       return (
-        <td key={col} style={{ textAlign: 'left' }}>
+        <td key={col} style={{textAlign: col === 'unitPrice' ? 'right' : 'left' }}>
           {value}
         </td>
       );
@@ -136,10 +136,17 @@ export default class PropertiesList extends Component {
       destroy: true,
       columnDefs: [
         {
-          targets: [3,4,5],
+          targets: [2,3,4,5],
           type: 'string',  
           className: 'dt-body-left'  
-        }
+        },
+        { width: '150px', targets: 0 },
+        { width: '170px', targets: 1 },
+        { width: '120px', targets: 2 },
+        { width: '120px', targets: 3 },
+        { width: '170px', targets: 4 },
+        { width: '210px', targets: 5 },
+        { width: '100px', targets: 6 },
       ]
     });
   }

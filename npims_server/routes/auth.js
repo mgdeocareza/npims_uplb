@@ -3,18 +3,20 @@ const router = express.Router();
 
 // Static list of users (replace with your real 50 pairs)
 const users = [
-  { username: 'admin1', password: 'admin1', role: 'admin' },
-  { username: 'admin2', password: 'admin2', role: 'admin' },  
-  { username: 'user1', password: 'pass1', role: 'user' },
-  { username: 'user2', password: 'pass2', role: 'user' },
-  { username: 'user3', password: 'pass3', role: 'user'  },
-  { username: 'user4', password: 'pass4', role: 'user'  },
-  { username: 'user5', password: 'pass5', role: 'user'  },
-  { username: 'user6', password: 'pass6', role: 'user'  },
-  { username: 'user7', password: 'pass7', role: 'user'  },
-  { username: 'user8', password: 'pass8', role: 'user'  },
-  { username: 'user9', password: 'pass9', role: 'user'  },
-  { username: 'user10', password: 'pass10', role: 'user'  },
+  { username: 'npims_admin', password: 'npims_mainlib2025', role: 'admin' },
+  { username: 'mmingua', password: 'mmingua@01', role: 'user' },  
+  { username: 'psmurillo', password: 'psmurillo@02', role: 'user' },
+  { username: 'mraltiche', password: 'mraltiche@03', role: 'user' },
+  { username: 'aocatelo', password: 'aocatelo@04', role: 'user'  },
+  { username: 'aabueno', password: 'aabueno@05', role: 'user'  },
+  { username: 'ildelossantos', password: 'ildelossantos@06', role: 'user' },  
+  { username: 'mspanday', password: 'mspanday@07', role: 'user' },
+  { username: 'cgbalmes', password: 'cgbalmes@08', role: 'user' },
+  { username: 'ahconcibido', password: 'ahconcibido@09', role: 'user'  },
+  { username: 'vpalcantara', password: 'vpalcantara@10', role: 'user'  },
+  { username: 'esdaradar', password: 'esdaradar@11', role: 'user' },  
+  { username: 'elsadrescalante', password: 'elsadrescalante@12', role: 'user' },
+  { username: 'romacgelloani', password: 'romacgelloani@13', role: 'user' },
 ];
 
 router.post('/', (req, res) => {
