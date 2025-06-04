@@ -24,7 +24,6 @@ export default function FilteredByArticle() {
         &larr; Back to Dashboard
       </button>
 
-      {/* Article bar */}
       <div
         style={{
           backgroundColor: "#f2dede",

@@ -30,9 +30,10 @@ const Login = () => {
       if (res.data.message === "Login successful") {
         localStorage.setItem("userRole", res.data.role);
         localStorage.setItem("loginUsername", username); 
-        console.log("Redirecting to /app/dashboard");
-        navigate("/app/dashboard");
-        console.log("navigate called");
+        window.location.href = "/app/dashboard";
+        // console.log("Redirecting to /app/dashboard");
+        // navigate("/app/dashboard");
+        // console.log("navigate called");
       }
     } catch (err) {
       console.log("Login error:", err);
