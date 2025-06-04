@@ -51,8 +51,8 @@ class EditProperty extends Component {
     };
 
     this.propertyTypes = ["Electronic", "Non-electronic"];
-    this.electronicArticles = ["Computer - Windows", "Computer - Mac", "Laptop", "Tablet", "Projector", "Printer", "Barcode Scanner", "Book Scanner", "UPS", "Aircon", "TV", "Flashdrive", "Camera", "Others"];
-    this.nonElectronicArticles = ["Conference Table", "Center Table", "Computer Table", "Chair", "Stool Chair", "Cabinet", "Card Catalog", "Others"];
+    this.electronicArticles = ["Computer - Windows", "Computer - Mac", "Laptop", "Tablet", "Projector", "Printer", "Barcode Scanner", "Book Scanner", "UPS", "Aircon", "TV", "Flashdrive", "Camera", "Others - Electronic"];
+    this.nonElectronicArticles = ["Conference Table", "Center Table", "Computer Table", "Chair", "Stool Chair", "Cabinet", "Card Catalog", "Others - Non Electronic"];
   }
 
   componentDidMount() {
@@ -63,7 +63,6 @@ class EditProperty extends Component {
 
         // Defensive: ensure staffInCharge arrays exist
         const staffInCharge = data.staffInCharge || [""];
-        console.log("STAFF!")
         console.log(staffInCharge)
         const historyLog = (data.historyLog || []).map((entry) => ({
           ...entry,

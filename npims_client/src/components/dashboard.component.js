@@ -1,14 +1,32 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import computerWindowsImg from "../images/a. Computer - Windows.jpg";
 
 const articleImages = {
-  Computer: "https://via.placeholder.com/100?text=Computer",
-  Printer: "https://via.placeholder.com/100?text=Printer",
-  Table: "https://via.placeholder.com/100?text=Table",
-  Chair: "https://via.placeholder.com/100?text=Chair",
-  Cabinet: "https://via.placeholder.com/100?text=Cabinet",
-  Aircon: "https://via.placeholder.com/100?text=Aircon",
+  'Computer - Windows': computerWindowsImg,
+  "Computer - Mac": computerWindowsImg, 
+  "Laptop": computerWindowsImg, 
+  "Tablet": computerWindowsImg, 
+  "Projector": computerWindowsImg, 
+  "Printer": computerWindowsImg, 
+  "Barcode Scanner": computerWindowsImg, 
+  "Book Scanner": computerWindowsImg, 
+  "UPS": computerWindowsImg, 
+  "Aircon": computerWindowsImg, 
+  "TV": computerWindowsImg, 
+  "Flashdrive": computerWindowsImg, 
+  "Camera": computerWindowsImg, 
+  "Others - Electronic": computerWindowsImg, 
+  "Conference Table": computerWindowsImg, 
+  "Center Table": computerWindowsImg, 
+  "Computer Table": computerWindowsImg, 
+  "Chair": computerWindowsImg, 
+  "Stool Chair": computerWindowsImg, 
+  "Cabinet": computerWindowsImg, 
+  "Card Catalog": computerWindowsImg, 
+  "Others - Non Electronic": computerWindowsImg, 
+  "Others": computerWindowsImg, 
 };
 
 export default function Dashboard() {

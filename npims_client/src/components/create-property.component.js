@@ -101,8 +101,8 @@
     render() {
       const { propertyType, article, acquisitionType, location, users, staffInCharge } = this.state;
 
-      const electronicArticles = ["Computer - Windows", "Computer - Mac", "Laptop", "Tablet", "Projector", "Printer", "Barcode Scanner", "Book Scanner", "UPS", "Aircon", "TV", "Flashdrive", "Camera", "Others"];
-      const nonElectronicArticles = ["Conference Table", "Center Table", "Computer Table", "Chair", "Stool Chair", "Cabinet", "Card Catalog", "Others"];
+      const electronicArticles = ["Computer - Windows", "Computer - Mac", "Laptop", "Tablet", "Projector", "Printer", "Barcode Scanner", "Book Scanner", "UPS", "Aircon", "TV", "Flashdrive", "Camera", "Others - Electronic"];
+      const nonElectronicArticles = ["Conference Table", "Center Table", "Computer Table", "Chair", "Stool Chair", "Cabinet", "Card Catalog", "Others - Non Electronic"];
       const articleOptions =
         propertyType === "Electronic" ? electronicArticles :
         propertyType === "Non-electronic" ? nonElectronicArticles : [];
