@@ -19,7 +19,7 @@ export default function Sidebar({ collapsed, onLogout }) {
   const currentPath = location.pathname;
 
   const role = localStorage.getItem("userRole");
-  const username = localStorage.getItem("username");
+  const username = localStorage.getItem("loginUsername");
 
   // Store icon components (not JSX elements)
   const allMenuItems = [
