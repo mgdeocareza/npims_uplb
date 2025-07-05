@@ -1,32 +1,53 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import computerWindowsImg from "../images/a. Computer - Windows.jpg";
+import Electronic_A from "../images/Electronic/A. Computer Windows.jpg";
+import Electronic_B from "../images/Electronic/B. Computer Mac.jpg";
+import Electronic_C from "../images/Electronic/C. Laptop.jpg"
+import Electronic_D from "../images/Electronic/D. Tablet.jpg"
+import Electronic_E from "../images/Electronic/E. Projector.jpg"
+import Electronic_F from "../images/Electronic/F. Printer.jpg";
+import Electronic_G from "../images/Electronic/G. Barcode Scanner.jpg";
+import Electronic_H from "../images/Electronic/H. Book Scanner.jpg";
+import Electronic_I from "../images/Electronic/I. UPS.jpg";
+import Electronic_J from "../images/Electronic/J. Aircon.jpg";
+import Electronic_K from "../images/Electronic/K. TV.jpg";
+import Electronic_L from "../images/Electronic/L. Flashdrive.jpg";
+import Electronic_M from "../images/Electronic/M. Camera.jpg";
+import Electronic_N from "../images/Electronic/N. Others Electronic.jpg";
+import Non_Electronic_A from "../images/Non Electronic/A. Conference Table.jpg";
+import Non_Electronic_B from "../images/Non Electronic/B. Center Table.webp";
+import Non_Electronic_C from "../images/Non Electronic/C. Computer Table.jpg"
+import Non_Electronic_D from "../images/Non Electronic/D. Chair.jpg"
+import Non_Electronic_E from "../images/Non Electronic/E. Stool Chair.jpg"
+import Non_Electronic_F from "../images/Non Electronic/F. Cabinet.jpg";
+import Non_Electronic_G from "../images/Non Electronic/G. Card Catalog.jpg";
+import Non_Electronic_H from "../images/Non Electronic/H. Others Nonelectronic.jpg";
+
 
 const articleImages = {
-  "Computer - Windows": computerWindowsImg,
-  "Computer - Mac": computerWindowsImg,
-  "Laptop": computerWindowsImg,
-  "Tablet": computerWindowsImg,
-  "Projector": computerWindowsImg,
-  "Printer": computerWindowsImg,
-  "Barcode Scanner": computerWindowsImg,
-  "Book Scanner": computerWindowsImg,
-  "UPS": computerWindowsImg,
-  "Aircon": computerWindowsImg,
-  "TV": computerWindowsImg,
-  "Flashdrive": computerWindowsImg,
-  "Camera": computerWindowsImg,
-  "Others - Electronic": computerWindowsImg,
-  "Conference Table": computerWindowsImg,
-  "Center Table": computerWindowsImg,
-  "Computer Table": computerWindowsImg,
-  "Chair": computerWindowsImg,
-  "Stool Chair": computerWindowsImg,
-  "Cabinet": computerWindowsImg,
-  "Card Catalog": computerWindowsImg,
-  "Others - Non Electronic": computerWindowsImg,
-  "Others": computerWindowsImg,
+  "Computer - Windows": Electronic_A,
+  "Computer - Mac": Electronic_B,
+  "Laptop": Electronic_C,
+  "Tablet": Electronic_D,
+  "Projector": Electronic_E,
+  "Printer": Electronic_F,
+  "Barcode Scanner": Electronic_G,
+  "Book Scanner": Electronic_H,
+  "UPS": Electronic_I,
+  "Aircon": Electronic_J,
+  "TV": Electronic_K,
+  "Flashdrive": Electronic_L,
+  "Camera": Electronic_M,
+  "Others - Electronic": Electronic_N,
+  "Conference Table": Non_Electronic_A,
+  "Center Table": Non_Electronic_B,
+  "Computer Table": Non_Electronic_C,
+  "Chair": Non_Electronic_D,
+  "Stool Chair": Non_Electronic_E,
+  "Cabinet": Non_Electronic_F,
+  "Card Catalog": Non_Electronic_G,
+  "Others - Non Electronic": Non_Electronic_H,
 };
 
 const electronicArticles = [

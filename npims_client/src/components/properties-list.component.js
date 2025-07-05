@@ -131,7 +131,7 @@ export default class PropertiesList extends Component {
 
   componentWillUnmount() {
     if ($.fn.DataTable.isDataTable("#propertiesTable")) {
-      $("#propertiesTable").DataTable().destroy(true);
+      $("#propertiesTable").DataTable().destroy();
     }
   }
 
@@ -146,19 +146,23 @@ export default class PropertiesList extends Component {
 
     this.setState({
       properties: this.state.properties.filter((el) => el._id !== id),
-    }, this.initializeDataTable);
+    }, () => {
+      this.initializeDataTable(); // reinitialize after state update and render
+    });
   }
 
   initializeDataTable() {
+    if ($.fn.DataTable.isDataTable("#propertiesTable")) {
+      $("#propertiesTable").DataTable().destroy();
+    }    
     $("#propertiesTable").DataTable({
       language: {
         lengthMenu: "Show _MENU_ entries"
       },
       responsive: true,
-      destroy: true,
       columnDefs: [
         {
-          targets: [2,3,4,5],
+          targets: [2,3,4,5], 
           type: 'string',  
           className: 'dt-body-left'  
         },
@@ -186,6 +190,16 @@ export default class PropertiesList extends Component {
     const loggedInUser = this.state.users.find(u => u.username === fullName || u.fullName === fullName);
     const loggedInUserId = loggedInUser ? loggedInUser._id : null;
 
+    if (this.state.role !== 'admin' && loggedInUserId) {
+      filtered = filtered.filter(p => {
+        if (Array.isArray(p.staffInCharge)) {
+          return p.staffInCharge.includes(loggedInUserId);
+        } else {
+          return p.staffInCharge === loggedInUserId;
+        }
+      });
+    }
+
     if (this.props.article) {
       filtered = filtered.filter(p => p.article === this.props.article);
     }
@@ -202,15 +216,7 @@ export default class PropertiesList extends Component {
       filtered = filtered.filter(p => p.location === this.props.location);
     }
 
-    if (this.state.role !== 'admin' && loggedInUserId) {
-      filtered = filtered.filter(p => {
-        if (Array.isArray(p.staffInCharge)) {
-          return p.staffInCharge.includes(loggedInUserId);
-        } else {
-          return p.staffInCharge === loggedInUserId;
-        }
-      });
-    }
+
 
     return filtered.map((property) => (
       <NPIMSProperty

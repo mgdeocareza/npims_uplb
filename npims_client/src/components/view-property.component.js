@@ -1,7 +1,5 @@
 import React, { Component } from "react";
 import axios from "axios";
-import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
 import withRouter from "./withRouter";
 
 class ViewProperty extends Component {
@@ -15,78 +13,111 @@ class ViewProperty extends Component {
       acquisitionType: "",
       dateAcquired: new Date(),
       unitPrice: 0,
-      endUser: "",
       location: "",
       status: "",
       historyLog: [],
+      users: [],
       loading: true,
       error: null,
     };
   }
 
   componentDidMount() {
-    axios
-      .get("/properties/" + this.props.params.id)
-      .then((response) => {
+    const propertyId = this.props.params.id;
+
+    // Fetch property and users concurrently
+    Promise.all([
+      axios.get("/properties/" + propertyId),
+      axios.get("/users/"),
+    ])
+      .then(([propertyRes, usersRes]) => {
         this.setState({
-          ...response.data,
-          dateAcquired: new Date(response.data.dateAcquired),
+          ...propertyRes.data,
+          dateAcquired: new Date(propertyRes.data.dateAcquired),
+          users: usersRes.data,
           loading: false,
         });
       })
       .catch((error) => {
-        this.setState({ error: "Failed to load property", loading: false });
+        this.setState({ error: "Failed to load data", loading: false });
         console.error(error);
       });
   }
 
-  render() {
-    if (this.state.loading) {
-      return <div>Loading property data...</div>;
-    }
-    if (this.state.error) {
-      return <div>{this.state.error}</div>;
-    }
+  // Create a userMap { userId: username } from users array
+  createUserMap() {
+    const { users } = this.state;
+    return Object.fromEntries(users.map((user) => [user._id, user.username || user.fullName || user.name]));
+  }
 
+  render() {
     const {
+      loading,
+      error,
       propertyNumber,
       propertyType,
       description,
       acquisitionType,
       dateAcquired,
       unitPrice,
-      endUser,
       location,
       status,
       historyLog,
     } = this.state;
 
+    if (loading) return <div>Loading property data...</div>;
+    if (error) return <div>{error}</div>;
+
+    const userMap = this.createUserMap();
+
     return (
-      <div>
-        <h3>View Property</h3>
+      <div
+        style={{
+          maxWidth: 700,
+          margin: "auto",
+          fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
+          padding: 20,
+        }}
+      >
+        <h2 style={{ color: "#7b1113", borderBottom: "2px solid #7b1113", paddingBottom: 8 }}>
+          Property Details
+        </h2>
 
-        <div><strong>Property Number:</strong> {propertyNumber}</div>
-        <div><strong>Property Type:</strong> {propertyType}</div>
-        <div><strong>Description:</strong> {description}</div>
-        <div><strong>Acquisition Type:</strong> {acquisitionType}</div>
-        <div><strong>Date Acquired:</strong> {dateAcquired.toLocaleDateString()}</div>
-        <div><strong>Unit Price:</strong> {unitPrice}</div>
-        <div><strong>End User:</strong> {endUser}</div>
-        <div><strong>Location:</strong> {location}</div>
-        <div><strong>Status:</strong> {status}</div>
+        <p><strong>Property Number:</strong> {propertyNumber}</p>
+        <p><strong>Property Type:</strong> {propertyType}</p>
+        <p><strong>Description:</strong> {description}</p>
+        <p><strong>Acquisition Type:</strong> {acquisitionType}</p>
+        <p><strong>Date Acquired:</strong> {dateAcquired.toLocaleDateString()}</p>
+        <p><strong>Unit Price:</strong> Php {unitPrice.toFixed(2)}</p>
+        <p><strong>Location:</strong> {location}</p>
+        <p><strong>Status:</strong> {status}</p>
 
-        <hr />
+        <hr style={{ margin: "30px 0" }} />
 
-        <h4>History Log</h4>
-        <ul>
+        <h3 style={{ color: "#7b1113", marginBottom: 16 }}>History Log</h3>
+        <ul style={{ listStyle: "none", paddingLeft: 0 }}>
           {historyLog.length === 0 ? (
             <li>No history entries available.</li>
           ) : (
-            historyLog.map((entry, index) => (
-              <li key={index}>
-                <strong>Date Assigned:</strong> {new Date(entry.dateAssigned).toLocaleDateString()}<br />
-                <strong>Location:</strong> {entry.location}<br />
-                <strong>Staff In Charge:</strong> {entry.staffInCharge}
+            historyLog.map((entry, idx) => (
+              <li
+                key={idx}
+                style={{
+                  backgroundColor: "#f9f9f9",
+                  padding: 12,
+                  borderRadius: 6,
+                  marginBottom: 12,
+                  boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
+                }}
+              >
+                <p><strong>Date Assigned:</strong> {new Date(entry.dateAssigned).toLocaleDateString()}</p>
+                <p><strong>Location:</strong> {entry.location}</p>
+                <p>
+                  <strong>Staff In Charge:</strong>{" "}
+                  {Array.isArray(entry.staffInCharge)
+                    ? entry.staffInCharge.map((id) => userMap[id] || id).join(", ")
+                    : userMap[entry.staffInCharge] || entry.staffInCharge}
+                </p>
               </li>
             ))
           )}
