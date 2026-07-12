@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 
-// Static list of users (replace with your real 50 pairs)
+// Static list of users
 const users = [
   { username: 'npims_admin', password: 'npims_admin@2025', role: 'admin' },
   { username: 'mmingua', password: 'mmingua@01', role: 'user' },  
