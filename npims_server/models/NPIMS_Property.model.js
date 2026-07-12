@@ -84,6 +84,7 @@ const NPIMSPropertySchema = new mongoose.Schema(
   },
   {
     timestamps: true,
+    collection: "npimsproperties",
   }
 );
 

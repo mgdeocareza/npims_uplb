@@ -10,7 +10,9 @@ import {
   FaUserTie,
   FaLaptopHouse,
   FaPlus,
+  FaFileUpload,
   FaUserPlus,
+  FaUsers,
   FaSignOutAlt,
 } from "react-icons/fa";
 
@@ -25,12 +27,14 @@ export default function Sidebar({ collapsed, onLogout }) {
   const allMenuItems = [
     { to: "/app/dashboard", label: "Dashboard", icon: FaTh },
     { to: "/app/", label: "View All Properties", icon: FaClipboardList },
-    { to: "/app/filter-by-material", label: "View By Material Type", icon: FaLayerGroup },
-    { to: "/app/filter-by-acquisition", label: "View By Acquisition Type", icon: FaFileContract },
+    { to: "/app/filter-by-material", label: "View By Material (Electronic/Non-electronic)", icon: FaLayerGroup },
+    { to: "/app/filter-by-acquisition", label: "View By Acquisition Type (PAR/ICS)", icon: FaFileContract },
     { to: "/app/filter-by-staff", label: "View By Staff In Charge", icon: FaUserTie },
     { to: "/app/filter-by-location", label: "View By Location", icon: FaLaptopHouse },
     { to: "/app/create", label: "Add Property", icon: FaPlus },
+    { to: "/app/import-csv", label: "Import via CSV", icon: FaFileUpload },
     { to: "/app/user", label: "Add Staff", icon: FaUserPlus },
+    { to: "/app/view-all-staff", label: "View All Staff", icon: FaUsers },
   ];
 
   const menuItems = role === "admin" ? allMenuItems : allMenuItems.slice(0, 4);

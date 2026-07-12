@@ -87,6 +87,9 @@ export default function Dashboard() {
     axios
       .get("/properties/")
       .then((response) => {
+        // console.log("API articles");
+        console.log("Raw response data", response.data);
+
         const grouped = {};
         response.data.forEach((prop) => {
           const article = prop.article;
@@ -111,6 +114,7 @@ export default function Dashboard() {
     const gap = 20;
     const cardsPerRow = 5;
     const containerMaxWidth = cardsPerRow * cardWidth + (cardsPerRow - 1) * gap; // 4*220 + 3*20 = 880 + 60 = 940
+    console.log("articleCounts:", articleCounts);
 
     return (
       <>
@@ -143,7 +147,7 @@ export default function Dashboard() {
           }}
         >
           {articles
-            .filter((article) => articleCounts[article])
+            // .filter((article) => article in articleCounts)
             .map((article) => (
               <div
                 key={article}

@@ -5,11 +5,24 @@ import axios from 'axios';
 export default function FilterByStaffInCharge() {
   const [selectedStaff, setSelectedStaff] = useState('');
   const [staffList, setStaffList] = useState([]);
+  const [userMap, setUserMap] = useState({});
 
   useEffect(() => {
+    axios.get('/users/')
+      .then(res => {
+        const map = {};
+        res.data.forEach(u => {
+          map[u._id] = u.username; 
+        });
+        setUserMap(map);
+      })
+      .catch(console.error);
+
     axios.get('/properties/')
       .then((response) => {
-        const allStaff = response.data.map(p => p.endUser);
+        console.log("response.data!!!")
+        console.log(response.data);
+        const allStaff = response.data.flatMap(p => p.staffInCharge || []);
         const uniqueStaff = [...new Set(allStaff.filter(Boolean))]; // Remove duplicates and empty
         console.log("Unique Staff List:", uniqueStaff);
         setStaffList(uniqueStaff);
@@ -33,13 +46,15 @@ export default function FilterByStaffInCharge() {
 
       <div style={{ marginBottom: '20px' }}>
         <select value={selectedStaff} onChange={handleChange}>
-          {staffList.map((staff, index) => (
-            <option key={index} value={staff}>{staff}</option>
+          {staffList.map((staffId) => (
+            <option key={staffId} value={staffId}>
+              {userMap[staffId] || staffId} 
+            </option>
           ))}
         </select>
       </div>
 
-      <PropertiesList endUser={selectedStaff} />
+      <PropertiesList staffInCharge={selectedStaff} />
     </div>
   );
 }

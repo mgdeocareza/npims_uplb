@@ -1,11 +1,7 @@
 import React, { Component } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
-import $ from "jquery";
-import 'datatables.net-dt/css/dataTables.dataTables.css';
-import "datatables.net";
 
-// Define readable column labels
 const COLUMN_LABELS = {
   propertyNumber: "Property No.",
   propertyType: "Material",
@@ -16,271 +12,267 @@ const COLUMN_LABELS = {
   unitPrice: "Unit Price",
   staffInCharge: "Staff In Charge",
   location: "Location",
-  status: "Status"
-};
-
-const LOGIN_TO_FULLNAME_MAP = {
-  mmingua: "Mary Ann M. Ingua",
-  psmurillo: "Pius S. Murillo",
-  mraltiche: "Maria Victoria R. Altiche",
-  aocatelo: "Armando O. Catelo",
-  aabueno: "Angeline A. Bueno",
-  ildelossantos: "Irene L. Delos Santos",
-  mspanday: "Myra S. Panday",
-  cgbalmes: "Christine G. Balmes",
-  ahconcibido: "Arnel H. Concibido",
-  vpalcantara: "Virginia P. Alcantara",
-  esdaradar: "Ella Marie S. Daradar",
-  elsadrescalante: "Elsa DR. Escalante",
-  romacgelloani: "Roma C. Gelloani"
+  status: "Status",
 };
 
 const COLUMN_SETS = {
-  default: ["propertyNumber", "propertyType", "article", "description", "acquisitionType", "dateAcquired", "unitPrice", "staffInCharge", "location", "status"],
-  viewAllFiltered: ["propertyNumber", "article", "dateAcquired", "unitPrice","staffInCharge", "location", "status"],
-  filterByArticle: ["propertyNumber", "description", "dateAcquired", "unitPrice", "staffInCharge", "location", "status"],
-  filterByAcquisition: ["propertyNumber", "article", "acquisitionType", "dateAcquired", "unitPrice", "staffInCharge", "location", "status"]
+  viewAllFiltered: [
+    "propertyNumber",
+    "article",
+    "dateAcquired",
+    "unitPrice",
+    "staffInCharge",
+    "location",
+    "status",
+  ],
+  filterByArticle: [
+    "propertyNumber",
+    "description",
+    "dateAcquired",
+    "unitPrice",
+    "staffInCharge",
+    "location",
+    "status",
+  ],
+  filterByAcquisition: [
+    "propertyNumber",
+    "article",
+    "acquisitionType",
+    "dateAcquired",
+    "unitPrice",
+    "staffInCharge",
+    "location",
+    "status",
+  ],
 };
 
-const NPIMSProperty = ({ property, deleteProperty, role, columns, userMap }) => (
-  <tr>
-    {columns.map((col) => {
-      let value = property[col];
-
-      if (col === "dateAcquired") {
-        value = value?.substring(0, 10);
-      }
-
-      if (col === "staffInCharge") {
-        if (Array.isArray(property[col])) {
-          value = property[col].map(id => userMap[id] || id).join(", ");
-        } else {
-          value = userMap[property[col]] || property[col];
+const NPIMSPropertyRow = ({ property, role, columns, userMap, deleteProperty, index }) => {
+  return (
+    <tr style={{ backgroundColor: index % 2 === 0 ? "#fff" : "#f9f9f9" }}>
+      {columns.map((col) => {
+        let value = property[col];
+        if (col === "dateAcquired") value = value?.substring(0, 10);
+        if (col === "staffInCharge") {
+          value = Array.isArray(value)
+            ? value.map((id) => userMap[id] || id).join(", ")
+            : userMap[value] || value;
         }
-      }
-
-      return (
-        <td key={col} style={{ textAlign: col === 'unitPrice' ? 'right' : 'left' }}>
-          {col === 'unitPrice' && typeof value === 'number' ? value.toFixed(2) : value}
-        </td>
-      );
-    })}
-    <td style={{ textAlign: 'left' }}>
-      <Link to={`/app/view/${property._id}`}>view</Link>
-      {role === 'admin' && (
-        <>
-          {" | "}
-          <Link to={`/app/edit/${property._id}`}>edit</Link>
-          {" | "}
-          <a href="#" onClick={(e) => {
-            e.preventDefault();
-            if (window.confirm("Are you sure you want to delete?")) {
-              deleteProperty(property._id);
-            }
-          }}>delete</a>
-        </>
-      )}
-    </td>
-  </tr>
-);
+        return (
+          <td key={col} style={{ textAlign: col === "unitPrice" ? "right" : "left", padding: "8px" }}>
+            {col === "unitPrice" && typeof value === "number" ? value.toFixed(2) : value}
+          </td>
+        );
+      })}
+      <td style={{ padding: "8px" }}>
+        <Link to={`/app/view/${property._id}`}>view</Link>
+        {role === "admin" && (
+          <>
+            {" | "}
+            <Link to={`/app/edit/${property._id}`}>edit</Link>
+            {" | "}
+            <button
+              style={{ background: "none", border: "none", color: "blue", cursor: "pointer" }}
+              onClick={() => {
+                if (window.confirm("Are you sure you want to delete?")) deleteProperty(property._id);
+              }}
+            >
+              delete
+            </button>
+          </>
+        )}
+      </td>
+    </tr>
+  );
+};
 
 export default class PropertiesList extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      properties: [],
-      users: [],
-      role: localStorage.getItem("userRole") || "user",
-    };
-    this.loginUsername = localStorage.getItem("loginUsername");
-    this.deleteProperty = this.deleteProperty.bind(this);
-  }
+  state = {
+    properties: [],
+    users: [],
+    role: localStorage.getItem("userRole") || "user",
+    searchQuery: "",
+    sortConfig: { key: "propertyNumber", direction: "asc" },
+  };
+
+  loginUsername = localStorage.getItem("loginUsername");
 
   componentDidMount() {
-    axios.get("/properties/")
-      .then((response) => {
-        this.setState({ properties: response.data }, () => {
-          this.initializeDataTable();
-        });
-      }).catch(console.error);
-
-    axios.get("/users/")
-      .then((res) => this.setState({ users: res.data }))
-      .catch(console.error);
-
-    const style = document.createElement('style');
-    style.innerHTML = `
-
-
-      #propertiesTable th.sorting,
-      #propertiesTable th.sorting_asc,
-      #propertiesTable th.sorting_desc {
-        text-align: left !important;
-        padding-right: 20px !important;
-      }
-
-      #propertiesTable th.sorting::after,
-      #propertiesTable th.sorting_asc::after,
-      #propertiesTable th.sorting_desc::after {
-        float: right !important;
-        margin-left: 5px;
-      }
-    `;
-    document.head.appendChild(style); 
+    axios.get("/properties/").then((res) => this.setState({ properties: res.data })).catch(console.error);
+    axios.get("/users/").then((res) => this.setState({ users: res.data })).catch(console.error);
   }
 
-  componentWillUnmount() {
-    if ($.fn.DataTable.isDataTable("#propertiesTable")) {
-      $("#propertiesTable").DataTable().destroy();
-    }
-  }
-
-  deleteProperty(id) {
-    if ($.fn.DataTable.isDataTable("#propertiesTable")) {
-      $("#propertiesTable").DataTable().destroy();
-    }
-
-    axios.delete("/properties/" + id).then((response) => {
-      console.log(response.data);
+  deleteProperty = (id) => {
+    axios.delete("/properties/" + id).then(() => {
+      this.setState((prev) => ({
+        properties: prev.properties.filter((p) => p._id !== id),
+      }));
     });
+  };
 
-    this.setState({
-      properties: this.state.properties.filter((el) => el._id !== id),
-    }, () => {
-      this.initializeDataTable(); // reinitialize after state update and render
+  handleSearch = (e) => this.setState({ searchQuery: e.target.value.toLowerCase() });
+
+  handleSort = (col) => {
+    this.setState((prev) => {
+      const direction =
+        prev.sortConfig.key === col && prev.sortConfig.direction === "asc" ? "desc" : "asc";
+      return { sortConfig: { key: col, direction } };
     });
-  }
+  };
 
-  initializeDataTable() {
-    if ($.fn.DataTable.isDataTable("#propertiesTable")) {
-      $("#propertiesTable").DataTable().destroy();
-    }    
-    $("#propertiesTable").DataTable({
-      language: {
-        lengthMenu: "Show _MENU_ entries"
-      },
-      responsive: true,
-      columnDefs: [
-        {
-          targets: [2,3,4,5], 
-          type: 'string',  
-          className: 'dt-body-left'  
-        },
-        { width: '180px', targets: 0 },
-        { width: '170px', targets: 1 },
-        { width: '120px', targets: 2 },
-        { width: '100px', targets: 3 },
-        { width: '170px', targets: 4 },
-        { width: '170px', targets: 5 },
-        // { width: '100px', targets: 6 },
-      ]
-    });
-  }
-
-  getActiveColumns() {
+  getActiveColumns = () => {
     if (this.props.article) return COLUMN_SETS.filterByArticle;
     if (this.props.acquisitionType) return COLUMN_SETS.filterByAcquisition;
     return COLUMN_SETS.viewAllFiltered;
-  }
+  };
 
-  propertyList(columns, userMap) {
-    let filtered = this.state.properties;
+  getFilteredAndSortedProperties = () => {
+    const { properties, searchQuery, sortConfig, users, role } = this.state;
+    const activeColumns = this.getActiveColumns();
+    const userMap = Object.fromEntries(users.map((u) => [u._id, u.username]));
 
-    const fullName = LOGIN_TO_FULLNAME_MAP[this.loginUsername];
-    const loggedInUser = this.state.users.find(u => u.username === fullName || u.fullName === fullName);
-    const loggedInUserId = loggedInUser ? loggedInUser._id : null;
+    let filtered = [...properties];
 
-    if (this.state.role !== 'admin' && loggedInUserId) {
-      filtered = filtered.filter(p => {
-        if (Array.isArray(p.staffInCharge)) {
-          return p.staffInCharge.includes(loggedInUserId);
-        } else {
-          return p.staffInCharge === loggedInUserId;
-        }
-      });
+    // Apply search filter
+    if (searchQuery) {
+      filtered = filtered.filter((p) =>
+        activeColumns.some((col) => {
+          let val = p[col];
+          if (col === "staffInCharge") {
+            val = Array.isArray(val) ? val.map((id) => userMap[id] || id).join(", ") : userMap[val] || val;
+          }
+          return (val ?? "").toString().toLowerCase().includes(searchQuery);
+        })
+      );
     }
 
-    if (this.props.article) {
-      filtered = filtered.filter(p => p.article === this.props.article);
-    }
-    if (this.props.materialType) {
-      filtered = filtered.filter(p => p.propertyType === this.props.materialType);
-    }
-    if (this.props.acquisitionType) {
-      filtered = filtered.filter(p => p.acquisitionType === this.props.acquisitionType);
-    }
-    if (this.props.staffInCharge) {
-      filtered = filtered.filter(p => p.staffInCharge === this.props.staffInCharge);
-    }
-    if (this.props.location) {
-      filtered = filtered.filter(p => p.location === this.props.location);
+    // Apply external filters
+    if (this.props.materialType)
+      filtered = filtered.filter((p) => p.propertyType === this.props.materialType);
+    if (this.props.article)
+      filtered = filtered.filter((p) => p.article === this.props.article);
+    if (this.props.acquisitionType)
+      filtered = filtered.filter((p) => p.acquisitionType === this.props.acquisitionType);
+    if (this.props.staffInCharge)
+      filtered = filtered.filter((p) =>
+        Array.isArray(p.staffInCharge)
+          ? p.staffInCharge.includes(this.props.staffInCharge)
+          : p.staffInCharge === this.props.staffInCharge
+      );
+    if (this.props.location)
+      filtered = filtered.filter((p) => p.location === this.props.location);
+
+    // Non-admin users only see their properties
+    if (role !== "admin" && this.loginUsername) {
+      const currentUser = users.find(
+        (u) => u.username === this.loginUsername || u.fullName === this.loginUsername
+      );
+      const userId = currentUser?._id;
+      if (userId) {
+        filtered = filtered.filter((p) =>
+          Array.isArray(p.staffInCharge)
+            ? p.staffInCharge.includes(userId)
+            : p.staffInCharge === userId
+        );
+      }
     }
 
+    // Sorting
+    const { key, direction } = sortConfig;
+    filtered.sort((a, b) => {
+      let valA = a[key] ?? "";
+      let valB = b[key] ?? "";
+      if (key === "staffInCharge") {
+        valA = Array.isArray(valA) ? valA.map((id) => userMap[id] || id).join(", ") : userMap[valA] || valA;
+        valB = Array.isArray(valB) ? valB.map((id) => userMap[id] || id).join(", ") : userMap[valB] || valB;
+      }
+      if (typeof valA === "string") valA = valA.toLowerCase();
+      if (typeof valB === "string") valB = valB.toLowerCase();
+      if (valA < valB) return direction === "asc" ? -1 : 1;
+      if (valA > valB) return direction === "asc" ? 1 : -1;
+      return 0;
+    });
 
-
-    return filtered.map((property) => (
-      <NPIMSProperty
-        key={property._id}
-        property={property}
-        deleteProperty={this.deleteProperty}
-        role={this.state.role}
-        columns={columns}
-        userMap={userMap}
-      />
-    ));
-  }
+    return filtered;
+  };
 
   render() {
-    const { showAll } = this.props;
-    const { role, users } = this.state;
+    const { users, role, searchQuery, sortConfig } = this.state;
     const activeColumns = this.getActiveColumns();
-    const userMap = Object.fromEntries(users.map(user => [user._id, user.username]));
+    const filteredProperties = this.getFilteredAndSortedProperties();
+    const userMap = Object.fromEntries(users.map((u) => [u._id, u.username]));
 
     return (
-      <>
-      {showAll && 
-      <div
-        style={{
-          backgroundColor: "#f2dede",
-          color: "#7b1113",
-          padding: "10px 20px",
-          borderRadius: "8px",
-          fontSize: "1.4rem",
-          fontWeight: "bold",
-          letterSpacing: "0.5px",
-          textAlign: "left",
-        }}
-      >
-      All Properties
-      </div>
-      }
+      <div style={{ maxWidth: 1180, margin: "0 auto", padding: "0 10px", overflowX: "auto" }}>
+        {this.props.showAll && (
+          <div
+            style={{
+              backgroundColor: "#f2dede",
+              color: "#7b1113",
+              padding: "10px 20px",
+              borderRadius: "8px",
+              fontSize: "1.4rem",
+              fontWeight: "bold",
+              letterSpacing: "0.5px",
+              textAlign: "left",
+              marginBottom: "10px",
+            }}
+          >
+            All Properties
+          </div>
+        )}
 
-      <div
-        style={{
-          maxWidth: 1180,     // Same max width as Dashboard container
-          marginLeft: "auto",
-          marginRight: "auto",
-          padding: "0 10px",
-          overflowX: "auto",   
-        }}
-      >
+        {/* Search Bar */}
+        <input
+          type="text"
+          placeholder="Search..."
+          value={searchQuery}
+          onChange={this.handleSearch}
+          style={{
+            marginBottom: "10px",
+            padding: "6px 10px",
+            width: "100%",
+            maxWidth: "300px",
+            borderRadius: "4px",
+            border: "1px solid #ccc",
+          }}
+        />
 
-
-        <table id="propertiesTable" className="display" style={{ width: "100%" }}>
-          <thead className="thead-light">
+        <table style={{ width: "100%", borderCollapse: "collapse" }}>
+          <thead>
             <tr>
-              {activeColumns.map(col => (
-                <th key={col} style={{ textAlign: 'left' }}>
-                  {COLUMN_LABELS[col] || col}
+              {activeColumns.map((col) => (
+                <th
+                  key={col}
+                  onClick={() => this.handleSort(col)}
+                  style={{
+                    textAlign: "left",
+                    borderBottom: "2px solid #ddd",
+                    padding: "8px",
+                    cursor: "pointer",
+                  }}
+                >
+                  {COLUMN_LABELS[col] || col}{" "}
+                  {sortConfig.key === col ? (sortConfig.direction === "asc" ? " 🔼" : " 🔽") : ""}
                 </th>
               ))}
-              <th style={{ textAlign: 'left' }}>Action</th>
+              <th style={{ textAlign: "left", borderBottom: "2px solid #ddd", padding: "8px" }}>Action</th>
             </tr>
           </thead>
-          <tbody>{this.propertyList(activeColumns, userMap)}</tbody>
+          <tbody>
+            {filteredProperties.map((property, idx) => (
+              <NPIMSPropertyRow
+                key={property._id}
+                property={property}
+                role={role}
+                columns={activeColumns}
+                userMap={userMap}
+                deleteProperty={this.deleteProperty}
+                index={idx}
+              />
+            ))}
+          </tbody>
         </table>
       </div>
-      </>
     );
   }
 }

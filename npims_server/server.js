@@ -7,9 +7,26 @@ const app = express();
 const port = process.env.PORT || 5000;
 
 // Middleware
+
+const allowedOrigins = process.env.CORS_ORIGIN
+  ? process.env.CORS_ORIGIN.split(",")
+  : [];
 // Setup CORS properly — allow frontend origin and credentials
+
+
+
 app.use(cors({
-  origin: process.env.CORS_ORIGIN.split(","),
+  origin: function (origin, callback) {
+    // allow requests with no origin (Postman, curl)
+    if (!origin) return callback(null, true);
+
+    if (allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+
+    console.error("Blocked by CORS:", origin);
+    callback(new Error("Not allowed by CORS"));
+  },  
   credentials: true,
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"], // allow all needed methods
   allowedHeaders: ["Content-Type", "Authorization"],    // allow needed headers
@@ -31,7 +48,7 @@ if (!uri) {
 }
 
 mongoose
-  .connect(uri, { useNewUrlParser: true, useUnifiedTopology: true })
+  .connect(uri)
   .then(() => {
     console.log("✅ Connected to MongoDB");
   })

@@ -19,7 +19,9 @@ import EditProperty from "./components/edit-property.component";
 import ViewProperty from "./components/view-property.component";
 import CreateProperty from "./components/create-property.component";
 import CreateUser from "./components/create-user.component";
+import StaffList from "./components/staff-list.component";
 import Login from "./components/login";
+import ImportPropertyViaCSV from "./components/import-property-via-csv.component";
 
 function App() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
@@ -95,7 +97,9 @@ function App() {
                         <Route path="edit/:id" element={<EditProperty />} />
                         <Route path="view/:id" element={<ViewProperty />} />
                         <Route path="create" element={<CreateProperty />} />
+                        <Route path="import-csv" element={<ImportPropertyViaCSV />} />
                         <Route path="user" element={<CreateUser />} />
+                        <Route path="view-all-staff" element={<StaffList />} />
                       </Routes>
                     </div>
                   </div>

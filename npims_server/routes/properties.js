@@ -2,6 +2,8 @@ const express = require("express");
 const router = express.Router();
 const mongoose = require("mongoose");
 const multer = require("multer");
+const csv = require("csv-parser");
+const fs = require("fs");
 const path = require("path");
 
 const NPIMSProperty = require("../models/NPIMS_Property.model");
@@ -87,6 +89,60 @@ router.route("/add").post(upload.array("images", 5), async (req, res) => {
     res.status(400).json("Error: " + err.message);
   }
 });
+
+// ==== IMPORT Properties via CSV ====
+router.post("/import-csv", upload.single("file"), async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ message: "No CSV file uploaded" });
+    }
+
+    const results = [];
+
+    fs.createReadStream(req.file.path)
+      .pipe(csv())
+      .on("data", (row) => {
+        results.push({
+          propertyNumber: row.propertyNumber,
+          propertyType: row.propertyType,
+          article: row.article,
+          description: row.description,
+          acquisitionType: row.acquisitionType,
+          dateAcquired: new Date(row.dateAcquired),
+          unitPrice: parseFloat(row.unitPrice) || 0,
+          location: row.location,
+          status: row.status,
+          staffInCharge: row.staffInCharge
+            ? row.staffInCharge.split("|") // optional: multiple users
+            : [],
+          images: [],
+          historyLog: [
+            {
+              dateAssigned: row.dateAcquired,
+              location: row.location,
+              staffInCharge: row.staffInCharge
+                ? row.staffInCharge.split("|")
+                : [],
+            },
+          ],
+        });
+      })
+      .on("end", async () => {
+        await NPIMSProperty.insertMany(results);
+        fs.unlinkSync(req.file.path); // cleanup
+
+        res.json({
+          message: "CSV imported successfully",
+          inserted: results.length,
+        });
+      });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "CSV import failed", error: err.message });
+  }
+});
+
+
 
 // ==== UPDATE Property ====
 router.route("/update/:id").post(upload.array("images", 5), (req, res) => {
